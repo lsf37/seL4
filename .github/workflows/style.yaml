@@ -31,7 +31,7 @@ jobs:
       with:
         python-version: '3.7'
     - name: Install python packages
-      run: pip install cmake_format==0.4.5 guardonce autopep8
+      run: pip install sel4-deps
     - name: Install astyle
       run: sudo apt-get install astyle
     - name: Run style check
