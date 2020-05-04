@@ -5,24 +5,15 @@
 name: Style
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
 
 jobs:
   style:
     name: Check Style
     runs-on: ubuntu-latest
-    env:
-      full_name: ${{ github.repository }}
     steps:
-    - name: Set env
-      run:
-        echo ::set-env name=repo_name::$(echo ${full_name##*/})
     - uses: actions/checkout@v2
-      with:
-        path: ${{ env.repo_name }}
+    - uses: technote-space/get-diff-action@v1
     - uses: actions/checkout@v2
       with:
         repository: seL4/sel4_tools
@@ -36,13 +27,11 @@ jobs:
       run: sudo apt-get install astyle
     - name: Run style check
       run: |
-        cd ${{ env.repo_name }}
-        ../sel4_tools/misc/style-all.sh
+        sel4_tools/misc/style-all.sh ${{ env.GIT_DIFF }}
         [ -z "$(git status --porcelain)" ] || (git diff; exit 1)
 
   shell:
     name: Check shell scripts
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
