@@ -23,6 +23,7 @@ set(CMAKE_ASM_COMPILER_ID Clang)
 set(CMAKE_ASM_COMPILER_TARGET ${TRIPLE})
 
 string(APPEND asm_common_flags " -Wno-unused-command-line-argument")
+string(APPEND asm_common_flags " -Wno-unused-command-line-argument")
 string(APPEND asm_common_flags " -fno-integrated-as")
 
 set(CMAKE_C_COMPILER "clang")
