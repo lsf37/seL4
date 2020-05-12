@@ -6,7 +6,8 @@
 
 cmake_minimum_required(VERSION 3.7.2)
 
-set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_NAME
+Generic)
 # For a generic system this is unused, so define it to something that will be
 # obvious if someone accidentally uses it
 set(CMAKE_SYSTEM_PROCESSOR seL4CPU)
