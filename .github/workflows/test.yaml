@@ -11,6 +11,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
-        echo "${{ github.head_ref }}"
         echo "${GITHUB_HEAD_REF}"
-        echo "${GITHUB_EVENT_PATH}"
+        echo "${GITHUB_REF}"
