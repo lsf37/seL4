@@ -35,12 +35,6 @@ lookupCapAndSlot_ret_t lookupCapAndSlot(tcb_t *thread, cptr_t cPtr)
     lookupCapAndSlot_ret_t ret;
 
     lu_ret = lookupSlot(thread, cPtr);
-    if (unlikely(lu_ret.status != EXCEPTION_NONE)) {
-        ret.status = lu_ret.status;
-        ret.slot = NULL;
-        ret.cap = cap_null_cap_new();
-        return ret;
-    }
 
     ret.status = EXCEPTION_NONE;
     ret.slot = lu_ret.slot;
