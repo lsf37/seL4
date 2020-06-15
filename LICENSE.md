@@ -14,6 +14,7 @@ publicly available SPDX tools to generate a bill of materials. The
 directory `LICENSES` contains the text for all licenses that are
 mentioned by files in this repository.
 
+
 ### GPL syscall note
 Note that, as in the [Linux syscall note for the GPL][2], the seL4
 kernel GPL license does *not* cover user-level code that uses kernel
