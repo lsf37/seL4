@@ -53,6 +53,10 @@ jobs:
       matrix:
         arch: [ARM, ARM_HYP, RISCV64, X64]
     steps:
+    - uses: actions/cache@v2
+      with:
+        path: cache/images.tar.bz2
+        key: ${{ matrix.arch }}-images
     - uses: lsf37/ci-actions/run-proofs@master
       with:
         L4V_ARCH: ${{ matrix.arch }}
