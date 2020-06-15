@@ -46,6 +46,7 @@ jobs:
         L4V_ARCH: ${{ matrix.arch }}
 
   proofs:
+    needs: preprocess
     name: Proofs
     runs-on: ubuntu-latest
     strategy:
