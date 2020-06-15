@@ -26,7 +26,7 @@ exception_t preemptionPoint(void)
      * We avoid checking for pending IRQs every call, as our callers tend to
      * call us in a tight loop and checking for pending IRQs can be quite slow.
      */
-    if (ksWorkUnitsCompleted >= CONFIG_MAX_NUM_WORK_UNITS_PER_PREEMPTION) {
+    if (CONFIG_MAX_NUM_WORK_UNITS_PER_PREEMPTION <= ksWorkUnitsCompleted) {
         ksWorkUnitsCompleted = 0;
         if (isIRQPending()) {
             return EXCEPTION_PREEMPTED;
