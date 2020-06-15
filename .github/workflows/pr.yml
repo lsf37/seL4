@@ -47,6 +47,7 @@ jobs:
 
   proofs:
     needs: preprocess
+    if: failure()
     name: Proofs
     runs-on: ubuntu-latest
     strategy:
