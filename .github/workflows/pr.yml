@@ -60,7 +60,7 @@ jobs:
         path: cache/
         # store for each new github.sha, but load from all image caches
         key: ${{ matrix.arch }}-images-cbase-${{ github.sha }}
-        key-restore: ${{ matrix.arch }}-images
+        restore-keys: ${{ matrix.arch }}-images
     - uses: seL4/ci-actions/run-proofs@master
       with:
         session: CBaseRefine
@@ -80,7 +80,7 @@ jobs:
         path: cache/
         # store for each new github.sha, but load from all image caches
         key: ${{ matrix.arch }}-images-crefine-${{ github.sha }}
-        key-restore: ${{ matrix.arch }}-images
+        restore-keys: ${{ matrix.arch }}-images
     - uses: seL4/ci-actions/run-proofs@master
       with:
         session: CRefine
