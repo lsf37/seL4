@@ -45,10 +45,10 @@ jobs:
       with:
         L4V_ARCH: ${{ matrix.arch }}
 
-  cbase:
+  proofs:
     needs: preprocess
     if: failure()
-    name: 'Proofs (Base)'
+    name: 'C Proofs'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -63,25 +63,4 @@ jobs:
         restore-keys: ${{ matrix.arch }}-images
     - uses: seL4/ci-actions/run-proofs@master
       with:
-        session: CBaseRefine
-        L4V_ARCH: ${{ matrix.arch }}
-
-  crefine:
-    needs: cbase
-    name: 'Proofs (C)'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [ARM, RISCV64]
-    steps:
-    - uses: actions/cache@v2
-      with:
-        path: cache/
-        # store for each new github.sha, but load from all image caches
-        key: ${{ matrix.arch }}-images-crefine-${{ github.sha }}
-        restore-keys: ${{ matrix.arch }}-images
-    - uses: seL4/ci-actions/run-proofs@master
-      with:
-        session: CRefine
         L4V_ARCH: ${{ matrix.arch }}
