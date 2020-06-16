@@ -57,7 +57,7 @@ jobs:
     steps:
     - uses: actions/cache@v2
       with:
-        path: cache/images.tar.bz2
+        path: cache/
         key: ${{ matrix.arch }}-images
     - uses: seL4/ci-actions/run-proofs@master
       with:
