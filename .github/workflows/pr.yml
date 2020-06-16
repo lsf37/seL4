@@ -39,21 +39,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [ARM, ARM_HYP, RISCV64, X64]
+        arch: [ARM, RISCV64]
     steps:
     - uses: seL4/ci-actions/preprocess@master
       with:
         L4V_ARCH: ${{ matrix.arch }}
 
-  proofs:
+  cspec:
     needs: preprocess
     if: failure()
-    name: Proofs
+    name: 'Proofs (CSpec)'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        arch: [ARM, ARM_HYP, RISCV64, X64]
+        arch: [ARM, RISCV64]
     steps:
     - uses: actions/cache@v2
       with:
@@ -61,4 +61,41 @@ jobs:
         key: ${{ matrix.arch }}-images
     - uses: seL4/ci-actions/run-proofs@master
       with:
+        session: CSpec
+        L4V_ARCH: ${{ matrix.arch }}
+
+  cbase:
+    needs: cspec
+    name: 'Proofs (CBaseRefine)'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ARM, RISCV64]
+    steps:
+    - uses: actions/cache@v2
+      with:
+        path: cache/
+        key: ${{ matrix.arch }}-images
+    - uses: seL4/ci-actions/run-proofs@master
+      with:
+        session: CBaseRefine
+        L4V_ARCH: ${{ matrix.arch }}
+
+  crefine:
+    needs: cbase
+    name: 'Proofs (CRefine)'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ARM, RISCV64]
+    steps:
+    - uses: actions/cache@v2
+      with:
+        path: cache/
+        key: ${{ matrix.arch }}-images
+    - uses: seL4/ci-actions/run-proofs@master
+      with:
+        session: CRefine
         L4V_ARCH: ${{ matrix.arch }}
