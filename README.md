@@ -7,8 +7,6 @@
 The seL4 microkernel
 ====================
 
-This project contains the source code of seL4 microkernel.
-
 For details about the seL4 microkernel, including details about its formal
 correctness proof, please see the [`sel4.systems`][1] website and associated
 [FAQ][2].
