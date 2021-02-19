@@ -121,7 +121,7 @@ static inline bool_t isCurDomainExpired(void)
            ksDomainTime < (NODE_STATE(ksConsumed) + MIN_BUDGET);
 }
 
-static inline void commitTime(void)
+static inline void commitTime(bool_t switched_domain)
 {
     if (NODE_STATE(ksCurSC)->scRefillMax) {
         if (likely(NODE_STATE(ksConsumed) > 0)) {
@@ -145,7 +145,7 @@ static inline void commitTime(void)
         }
         NODE_STATE(ksCurSC)->scConsumed += NODE_STATE(ksConsumed);
     }
-    if (CONFIG_NUM_DOMAINS > 1) {
+    if (CONFIG_NUM_DOMAINS > 1 && !switched_domain) {
         assert(ksDomainTime > NODE_STATE(ksConsumed));
         if (NODE_STATE(ksConsumed) < ksDomainTime) {
             ksDomainTime -= NODE_STATE(ksConsumed);
