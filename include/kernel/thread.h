@@ -145,8 +145,8 @@ static inline void commitTime(bool_t switched_domain)
         }
         NODE_STATE(ksCurSC)->scConsumed += NODE_STATE(ksConsumed);
     }
-    /* If we have switched domains, ksDomainTime has already been reset and is accounted for the 
-     * old domain. If we have not switched domains, we still need to account for the time that 
+    /* If we have switched domains, ksDomainTime has already been reset and is accounted for the
+     * old domain. If we have not switched domains, we still need to account for the time that
      * has passed. */
     if (CONFIG_NUM_DOMAINS > 1 && !switched_domain) {
         assert(ksDomainTime > NODE_STATE(ksConsumed));
