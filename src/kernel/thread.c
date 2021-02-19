@@ -337,7 +337,7 @@ static bool_t scheduleChooseNewThread(void)
     bool_t switched_domain = false;
     if (ksDomainTime == 0) {
         nextDomain();
-        switched_domain = true
+        switched_domain = true;
     }
     chooseThread();
     return switched_domain;
