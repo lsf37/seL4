@@ -349,7 +349,11 @@ void schedule(void)
     awaken();
 #endif
 
+#ifdef CONFIG_KERNEL_MCS
     bool_t switchedDomain = false;
+#else
+    bool_t switchedDomain __attribute__((unused));
+#endif
     if (NODE_STATE(ksSchedulerAction) != SchedulerAction_ResumeCurrentThread) {
         bool_t was_runnable;
         if (isSchedulable(NODE_STATE(ksCurThread))) {
