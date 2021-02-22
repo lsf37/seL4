@@ -334,13 +334,13 @@ static void switchSchedContext(void)
 
 static bool_t scheduleChooseNewThread(void)
 {
-    bool_t switched_domain = false;
+    bool_t switchedDomain = false;
     if (ksDomainTime == 0) {
         nextDomain();
-        switched_domain = true;
+        switchedDomain = true;
     }
     chooseThread();
-    return switched_domain;
+    return switchedDomain;
 }
 
 void schedule(void)
@@ -349,7 +349,7 @@ void schedule(void)
     awaken();
 #endif
 
-    bool_t switched_domain = false;
+    bool_t switchedDomain = false;
     if (NODE_STATE(ksSchedulerAction) != SchedulerAction_ResumeCurrentThread) {
         bool_t was_runnable;
         if (isSchedulable(NODE_STATE(ksCurThread))) {
@@ -360,7 +360,7 @@ void schedule(void)
         }
 
         if (NODE_STATE(ksSchedulerAction) == SchedulerAction_ChooseNewThread) {
-            switched_domain = scheduleChooseNewThread();
+            switchedDomain = scheduleChooseNewThread();
         } else {
             tcb_t *candidate = NODE_STATE(ksSchedulerAction);
             assert(isSchedulable(candidate));
@@ -376,14 +376,14 @@ void schedule(void)
                 SCHED_ENQUEUE(candidate);
                 /* we can't, need to reschedule */
                 NODE_STATE(ksSchedulerAction) = SchedulerAction_ChooseNewThread;
-                switched_domain = scheduleChooseNewThread();
+                switchedDomain = scheduleChooseNewThread();
             } else if (was_runnable && candidate->tcbPriority == NODE_STATE(ksCurThread)->tcbPriority) {
                 /* We append the candidate at the end of the scheduling queue, that way the
                  * current thread, that was enqueued at the start of the scheduling queue
                  * will get picked during chooseNewThread */
                 SCHED_APPEND(candidate);
                 NODE_STATE(ksSchedulerAction) = SchedulerAction_ChooseNewThread;
-                switched_domain = scheduleChooseNewThread();
+                switchedDomain = scheduleChooseNewThread();
             } else {
                 assert(candidate != NODE_STATE(ksCurThread));
                 switchToThread(candidate);
@@ -397,7 +397,7 @@ void schedule(void)
 #endif /* ENABLE_SMP_SUPPORT */
 
 #ifdef CONFIG_KERNEL_MCS
-    switchSchedContext(switched_domain);
+    switchSchedContext(switchedDomain);
 
     if (NODE_STATE(ksReprogram)) {
         setNextInterrupt();
