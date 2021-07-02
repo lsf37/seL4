@@ -19,8 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        march: ["armv6a, armv8a", armv7a, nehalem, rv32imac, rv64imac]
+        march: [armv6a, armv7a, armv8a, nehalem, rv32imac, rv64imac]
         compiler: [gcc, clang]
+        exclude:
+          - march: [rv32imac, rv64imac]
+            compiler: clang
     steps:
     - uses: seL4/ci-actions/sel4test-sim@sel4test-sim
       with:
