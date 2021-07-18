@@ -16,6 +16,7 @@ on:
 
 jobs:
   sim:
+    if: ${{ false }}
     name: Simulation
     runs-on: ubuntu-latest
     strategy:
@@ -41,19 +42,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        march: [armv6a, armv7a, armv8a, nehalem]
-        compiler: [gcc, clang]
-        include:
-          - march: rv64imac
-            compiler: gcc
+        march: [armv6a]
+        compiler: [gcc]
     steps:
     - name: Build
       uses: seL4/ci-actions/sel4test-hw@master
       with:
         march: ${{ matrix.march }}
         compiler: ${{ matrix.compiler }}
-    - name: Upload images
-      uses: actions/upload-artifact@v2
-      with:
-        name: images-${{ matrix.march }}-${{ matrix.compiler }}
-        path: '*-images.tar.gz'
+    # - name: Upload images
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: images-${{ matrix.march }}-${{ matrix.compiler }}
+    #     path: '*-images.tar.gz'
