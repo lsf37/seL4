@@ -38,6 +38,7 @@ jobs:
     name: HW Build
     runs-on: ubuntu-latest
     if: ${{ github.event.name == 'push' ||
+            github.event.name == 'pull_request' &&
             contains(github.event.pull_request.labels.*.name, 'hw-build') }}
     strategy:
       fail-fast: false
@@ -45,6 +46,9 @@ jobs:
         march: [armv6a]
         compiler: [gcc]
     steps:
+    - name: Dump
+      run: |
+        echo ${{ github.event }}
     - name: Build
       uses: seL4/ci-actions/sel4test-hw@master
       with:
