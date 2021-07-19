@@ -46,8 +46,10 @@ jobs:
         compiler: [gcc]
     steps:
     - name: Dump
+      env:
+        EVENT: ${{ toJSON(github.event) }}
       run: |
-        echo ${{ toJSON(github.event) }}
+        echo "$EVENT"
     # - name: Build
     #   uses: seL4/ci-actions/sel4test-hw@master
     #   with:
