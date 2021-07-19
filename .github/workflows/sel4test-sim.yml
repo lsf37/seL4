@@ -47,12 +47,12 @@ jobs:
     steps:
     - name: Dump
       run: |
-        echo ${{ github.event }}
-    - name: Build
-      uses: seL4/ci-actions/sel4test-hw@master
-      with:
-        march: ${{ matrix.march }}
-        compiler: ${{ matrix.compiler }}
+        echo ${{ toJSON(github.event) }}
+    # - name: Build
+    #   uses: seL4/ci-actions/sel4test-hw@master
+    #   with:
+    #     march: ${{ matrix.march }}
+    #     compiler: ${{ matrix.compiler }}
     # - name: Upload images
     #   uses: actions/upload-artifact@v2
     #   with:
