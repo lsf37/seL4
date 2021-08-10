@@ -5,16 +5,16 @@ on: [pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    outputs:
-      xml: ${{ steps.repo.outputs.xml }}
+    # outputs:
+    #   xml: ${{ steps.repo.outputs.xml }}
     steps:
     - uses: seL4/ci-actions/repo-checkout@repo
       id: repo
       with:
         manifest_repo: sel4test-manifest
-    # - env:
-    #     XML: ${{ steps.repo.outputs.xml }}
-    #   run: echo "${XML}"
+    - env:
+        XML: ${{ steps.repo.outputs.xml }}
+      run: echo "${XML}"
 
   test2:
     needs: test
