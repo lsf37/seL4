@@ -12,9 +12,9 @@ jobs:
       id: repo
       with:
         manifest_repo: sel4test-manifest
-    - env:
-        XML: ${{ steps.repo.outputs.xml }}
-      run: echo "${XML}"
+    # - env:
+    #     XML: ${{ steps.repo.outputs.xml }}
+    #   run: echo "${XML}"
 
   test2:
     needs: test
