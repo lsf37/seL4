@@ -12,7 +12,6 @@ jobs:
       id: repo
       with:
         manifest_repo: sel4test-manifest
-    - run: echo "hello"
 
   test2:
     needs: test
