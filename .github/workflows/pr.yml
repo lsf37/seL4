@@ -9,8 +9,7 @@ jobs:
     - uses: seL4/ci-actions/repo-checkout@repo
       id: repo
       with:
-        manifest-repo: sel4test-manifest
+        manifest_repo: sel4test-manifest
     - env:
         XML: ${{ steps.repo.outputs.xml }}
       run: echo "${XML}"
-
