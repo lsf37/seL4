@@ -8,15 +8,11 @@ jobs:
     outputs:
       xml: ${{ steps.repo.outputs.xml }}
     steps:
-      - id: repo
-        run: echo "::set-output name=xml::something"
-    # - uses: seL4/ci-actions/repo-checkout@repo
-    #   id: repo
-    #   with:
-    #     manifest_repo: sel4test-manifest
-    # - env:
-    #     XML: ${{ steps.repo.outputs.xml }}
-    #   run: echo "${XML}"
+    - uses: seL4/ci-actions/repo-checkout@repo
+      id: repo
+      with:
+        manifest_repo: sel4test-manifest
+    - run: echo "hello"
 
   test2:
     needs: test
