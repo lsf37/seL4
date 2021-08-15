@@ -92,9 +92,8 @@ jobs:
            - platform: pc99
              compiler: clang
              mode: 64
-        # include:
-        #    - platform: hifive
-        #      compiler: gcc
+           - platform: hifive
+             compiler: gcc
     steps:
       - name: Get machine queue
         uses: actions/checkout@v2
