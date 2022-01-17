@@ -33,6 +33,7 @@ jobs:
     # test only most recent push to PR:
     concurrency: seL4-PR-C-proofs-${{ github.event.number }}-${{ strategy.job-index }}
     steps:
+    - run: echo "seL4-PR-C-proofs-${{ github.event.number }}-${{ strategy.job-index }}"
     - name: Proofs
       uses: seL4/ci-actions/aws-proofs@master
       with:
