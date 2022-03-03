@@ -564,6 +564,9 @@ union_get_tag_def_entry_template = \
 ''' >> %(tag_shift)d) AND mask %(tag_size)d
       else '''
 
+union_get_tag_def_sliced_template = \
+    '''(index (%(name)s_C.words_C %(name)s) %(tag_index)d) AND %(tag_mask)d'''
+
 union_get_tag_def_final_template = \
     '''((index (%(name)s_C.words_C %(name)s) %(tag_index)d)'''\
     ''' >> %(tag_shift)d) AND mask %(tag_size)d'''
@@ -579,6 +582,9 @@ union_get_tag_eq_x_def_entry_template = \
       then ((index (%(name)s_C.words_C c) %(tag_index)d)''' \
 ''' >> %(tag_shift)d) AND mask %(tag_size)d
       else '''
+
+union_get_tag_eq_x_def_sliced_template = \
+    '''(index (%(name)s_C.words_C c) %(tag_index)d) AND %(tag_mask)d'''
 
 union_get_tag_eq_x_def_final_template = \
     '''((index (%(name)s_C.words_C c) %(tag_index)d)''' \
@@ -1650,7 +1656,7 @@ class TaggedUnion:
         # Generate block records with tag field removed
         for name, value, ref in self.tags:
             if ref.generate_hol_defs(params,
-                                     suppressed_field=self.tagname,
+                                     suppressed_fields=self.tag_slices,
                                      prefix="%s_" % self.name,
                                      in_union=True):
                 empty_blocks[ref] = True
@@ -1671,60 +1677,74 @@ class TaggedUnion:
         subs = {"name":      self.name,
                 "base":      self.base}
 
-        templates = ([union_get_tag_def_entry_template] * (len(self.widths) - 1)
-                     + [union_get_tag_def_final_template])
+        if self.sliced_tag:
+            slice_subs = dict(subs, tag_mask=self.tag_mask, tag_index=self.tag_index)
 
-        fs = (union_get_tag_def_header_template % subs
-              + "".join([template %
-                         dict(subs,
-                              tag_size=width,
-                              classmask=self.word_classmask(width),
-                              tag_index=self.tag_offset[width] // self.base,
-                              tag_shift=self.tag_offset[width] % self.base)
-                         for template, width in zip(templates, self.widths)])
-              + union_get_tag_def_footer_template % subs)
+        if self.sliced_tag:
+            fs = (union_get_tag_def_header_template % subs
+                + union_get_tag_def_sliced_template % slice_subs
+                + union_get_tag_def_footer_template % subs)
+        else:
+            templates = ([union_get_tag_def_entry_template] * (len(self.widths) - 1)
+                        + [union_get_tag_def_final_template])
+
+            fs = (union_get_tag_def_header_template % subs
+                + "".join([template %
+                            dict(subs,
+                                tag_size=width,
+                                classmask=self.word_classmask(width),
+                                tag_index=self.tag_index,
+                                tag_shift=self.tag_offset[width] % self.base)
+                            for template, width in zip(templates, self.widths)])
+                + union_get_tag_def_footer_template % subs)
 
         print(fs, file=output)
         print(file=output)
 
         # Generate get_tag_eq_x lemma
-        templates = ([union_get_tag_eq_x_def_entry_template]
-                     * (len(self.widths) - 1)
-                     + [union_get_tag_eq_x_def_final_template])
+        if self.sliced_tag:
+            fs = (union_get_tag_eq_x_def_header_template % subs
+                + union_get_tag_eq_x_def_sliced_template % slice_subs
+                + union_get_tag_eq_x_def_footer_template % subs)
+        else:
+            templates = ([union_get_tag_eq_x_def_entry_template]
+                        * (len(self.widths) - 1)
+                        + [union_get_tag_eq_x_def_final_template])
 
-        fs = (union_get_tag_eq_x_def_header_template % subs
-              + "".join([template %
-                         dict(subs,
-                              tag_size=width,
-                              classmask=self.word_classmask(width),
-                              tag_index=self.tag_offset[width] // self.base,
-                              tag_shift=self.tag_offset[width] % self.base)
-                         for template, width in zip(templates, self.widths)])
-              + union_get_tag_eq_x_def_footer_template % subs)
+            fs = (union_get_tag_eq_x_def_header_template % subs
+                + "".join([template %
+                            dict(subs,
+                                tag_size=width,
+                                classmask=self.word_classmask(width),
+                                tag_index=self.tag_offset[width] // self.base,
+                                tag_shift=self.tag_offset[width] % self.base)
+                            for template, width in zip(templates, self.widths)])
+                + union_get_tag_eq_x_def_footer_template % subs)
 
         print(fs, file=output)
         print(file=output)
 
         # Generate mask helper lemmas
 
-        for name, value, ref in self.tags:
-            offset, size, _ = ref.field_map[self.tagname]
-            part_widths = [w for w in self.widths if w < size]
-            if part_widths:
-                subs = {"name":         self.name,
-                        "block":        name,
-                        "full_mask":    hex(2 ** size - 1),
-                        "full_value":   hex(value)}
+        if not self.sliced_tag:
+            for name, value, ref in self.tags:
+                offset, size, _ = ref.field_map[self.tagname]
+                part_widths = [w for w in self.widths if w < size]
+                if part_widths:
+                    subs = {"name":         self.name,
+                            "block":        name,
+                            "full_mask":    hex(2 ** size - 1),
+                            "full_value":   hex(value)}
 
-                fs = (union_tag_mask_helpers_header_template % subs
-                      + "".join([union_tag_mask_helpers_entry_template %
-                                 dict(subs, part_mask=hex(2 ** pw - 1),
-                                      part_value=hex(value & (2 ** pw - 1)))
-                                 for pw in part_widths])
-                      + union_tag_mask_helpers_footer_template)
+                    fs = (union_tag_mask_helpers_header_template % subs
+                        + "".join([union_tag_mask_helpers_entry_template %
+                                    dict(subs, part_mask=hex(2 ** pw - 1),
+                                        part_value=hex(value & (2 ** pw - 1)))
+                                    for pw in part_widths])
+                        + union_tag_mask_helpers_footer_template)
 
-                print(fs, file=output)
-                print(file=output)
+                    print(fs, file=output)
+                    print(file=output)
 
         # Generate lift definition
         collapse_proofs = ""
@@ -1735,7 +1755,7 @@ class TaggedUnion:
             for field in ref.visible_order:
                 offset, size, high = ref.field_map[field]
 
-                if field == self.tagname:
+                if field in self.tag_slices:
                     continue
 
                 index = offset // self.base
@@ -2348,7 +2368,7 @@ class Block:
                                  "crosses a word boundary"
                                  % (name, self.name))
 
-    def generate_hol_defs(self, params, suppressed_field=None,
+    def generate_hol_defs(self, params, suppressed_fields=[],
                           prefix="", in_union=False):
         output = params.output
 
@@ -2364,14 +2384,12 @@ class Block:
         empty = True
 
         for field in self.visible_order:
-            if suppressed_field == field:
+            if field in suppressed_fields:
                 continue
 
             empty = False
 
             out += '    %s_CL :: "word%d"\n' % (field, self.base)
-
-        word_updates = ""
 
         if not empty:
             print(out, file=output)
