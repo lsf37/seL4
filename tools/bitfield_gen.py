@@ -258,8 +258,28 @@ def p_tags_empty(t):
     t[0] = []
 
 
+def p_tag_values_one(t):
+    """tag_values : INTLIT"""
+    t[0] = [t[1]]
+
+
+def p_tag_values(t):
+    """tag_values : tag_values COMMA INTLIT"""
+    t[0] = t[1] + [t[3]]
+
+
+def p_tag_value(t):
+    """tag_value : LPAREN tag_values RPAREN"""
+    t[0] = t[2]
+
+
+def p_tag_value_one(t):
+    """tag_value : INTLIT"""
+    t[0] = [t[1]]
+
+
 def p_tags(t):
-    """tags : tags TAG IDENTIFIER INTLIT"""
+    """tags : tags TAG IDENTIFIER tag_value"""
     t[0] = t[1] + [(t[3], t[4])]
 
 
@@ -1264,11 +1284,38 @@ class TaggedUnion:
         self.tag_slices = tag_slices
         self.tagname = tagname
         self.constant_suffix = ''
+        self.classes = dict(classes)
+        self.tags = tags
+
+    def resolve_tag_values(self):
+        """Turn compound tag values into single tag values."""
+
+        for name, value, ref in self.tags:
+            if self.sliced_tag:
+                if len(value) > 1:
+                    if len(value) != len(self.tag_slices):
+                        raise ValueError("Tag value for element %s of tagged union"
+                                         "%s has incorrect number of parts" % (name, self.name))
+                    compound = 0
+                    for i, tag_slice in enumerate(self.tag_slices):
+                        offset, size, _ = ref.field_map[tag_slice]
+                        if value[i] > 2 ** size - 1:
+                            raise ValueError("Tag value %s for element %s of tagged union"
+                                             "%s is too large for its field size" %
+                                             (value[i], name, self.name))
+                        compound |= value[i] << offset
+                    value[0] = compound
+            else:
+                if len(value) != 1:
+                    raise ValueError("Tag value %s for element %s of tagged union"
+                                     "%s must be a single value" % (value, name, self.name))
+
+        self.tags = [(name, value[0], ref) for name, value, ref in self.tags]
 
         # Check for duplicate tags
         used_names = set()
         used_values = set()
-        for name, value in tags:
+        for name, value, _ in self.tags:
             if name in used_names:
                 raise ValueError("Duplicate tag name %s" % name)
             if value in used_values:
@@ -1276,8 +1323,6 @@ class TaggedUnion:
 
             used_names.add(name)
             used_values.add(value)
-        self.classes = dict(classes)
-        self.tags = tags
 
     def resolve(self, params, symtab):
         # Grab block references for tags
@@ -1289,6 +1334,8 @@ class TaggedUnion:
             self.record_tag_data()
         else:
             self.make_classes(params)
+
+        self.resolve_tag_values()
 
         # Ensure that block sizes and tag size & position match for
         # all tags in the union
