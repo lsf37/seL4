@@ -33,6 +33,16 @@ DEBUG = False
 # name of locale the bitfield proofs should be in
 loc_name = 'kernel_all_substitute'
 
+# supported constant base sizes
+base_list = [8, 16, 32, 64]
+
+# maps base to suffix for literals:
+# assumes that unsigned int = 32 bit on 32-bit and 64-bit platforms,
+# and that unsigned long long = 64 bit on 64-bit platforms.
+# Should still work fine if ull = 128 bit, but will not work
+# if unsigned int is less than 32 bit.
+suffix_map = {8: 'u', 16: 'u', 32: 'u', 64: 'ull'}
+
 # The C parser emits variables with a suffix to indicate their types; this lets
 # the C parser distinguish `char x` from `int x`.
 #
@@ -545,7 +555,7 @@ where
 
 block_lift_lemma_template = \
     '''lemma %(union)s_%(block)s_lift:
-  "(%(union)s_get_tag c = scast %(union)s_%(block)s) = ''' \
+  "(%(union)s_get_tag c = %(cast)s %(union)s_%(block)s) = ''' \
  '''(%(union)s_lift c = Some (%(generator)s (%(union)s_%(block)s_lift c)))"
   unfolding %(union)s_lift_def %(union)s_%(block)s_lift_def
   by (clarsimp simp: %(union)s_tag_defs Let_def)'''
@@ -715,7 +725,7 @@ def ptr_get_tag_template(ptrname):
 def ptr_empty_union_new_template(ptrname):
     return ptr_union_basic_template('new', ptrname, '', '', '',
                                     '''{t. \<exists>%(name)s. '''
-                                    '''%(name)s_get_tag %(name)s = scast %(name)s_%(block)s \<and>
+                                    '''%(name)s_get_tag %(name)s = %(cast)s %(name)s_%(block)s \<and>
                                     t_hrs_' (globals t) = hrs_mem_update (heap_update
                                             (''' + ptrname + ''')
                                             %(update_path)s)
@@ -728,7 +738,7 @@ def ptr_union_new_template(ptrname):
                                     '''{t. \<exists>%(name)s. '''
                                     '''%(name)s_%(block)s_lift %(name)s = \<lparr>
                                     %(field_eqs)s \<rparr> \<and>
-                                    %(name)s_get_tag %(name)s = scast %(name)s_%(block)s \<and>
+                                    %(name)s_get_tag %(name)s = %(cast)s %(name)s_%(block)s \<and>
                                     t_hrs_' (globals t) = hrs_mem_update (heap_update
                                             (''' + ptrname + ''')
                                             %(update_path)s)
@@ -739,7 +749,7 @@ def ptr_union_new_template(ptrname):
 def ptr_union_get_template(ptrname):
     return ptr_union_basic_template('get_%(field)s', ptrname,
                                     '\<acute>%(ret_name)s :== ', '',
-                                    '\<and> %(name)s_get_tag %(access_path)s = scast %(name)s_%(block)s',
+                                    '\<and> %(name)s_get_tag %(access_path)s = %(cast)s %(name)s_%(block)s',
                                     '''\<lbrace>\<acute>%(ret_name)s = '''
                                     '''%(name)s_%(block)s_CL.%(field)s_CL '''
                                     '''(%(name)s_%(block)s_lift %(access_path)s)\<rbrace>''')
@@ -747,13 +757,13 @@ def ptr_union_get_template(ptrname):
 
 def ptr_union_set_template(ptrname):
     return ptr_union_basic_template('set_%(field)s', ptrname, '', ', \<acute>v%(base)d',
-                                    '\<and> %(name)s_get_tag %(access_path)s = scast %(name)s_%(block)s',
+                                    '\<and> %(name)s_get_tag %(access_path)s = %(cast)s %(name)s_%(block)s',
                                     '''{t. \<exists>%(name)s. '''
                                     '''%(name)s_%(block)s_lift %(name)s =
                                     %(name)s_%(block)s_lift %(access_path)s '''
                                     '''\<lparr> %(name)s_%(block)s_CL.%(field)s_CL '''
                                     ''':= %(sign_extend)s(\<^bsup>s\<^esup>v%(base)d AND %(mask)s) \<rparr> \<and>
-                                    %(name)s_get_tag %(name)s = scast %(name)s_%(block)s \<and>
+                                    %(name)s_get_tag %(name)s = %(cast)s %(name)s_%(block)s \<and>
                                     t_hrs_' (globals t) = hrs_mem_update (heap_update
                                             (''' + ptrname + ''')
                                             %(update_path)s)
@@ -765,7 +775,7 @@ proof_templates = {
 
     'lift_collapse_proof': [
         '''lemma %(name)s_lift_%(block)s:
-  "%(name)s_get_tag %(name)s = scast %(name)s_%(block)s \<Longrightarrow>
+  "%(name)s_get_tag %(name)s = %(cast)s %(name)s_%(block)s \<Longrightarrow>
   %(name)s_lift %(name)s =
   Some (%(value)s)"''',
         ''' by (simp add:%(name)s_lift_def %(name)s_tag_defs)'''],
@@ -1014,7 +1024,7 @@ proof_templates = {
        \<acute>ret__struct_%(name)s_C :== ''' \
     '''PROC %(name)s_%(block)s_new()
        \<lbrace>%(name)s_get_tag \<acute>ret__struct_%(name)s_C = ''' \
-     '''scast %(name)s_%(block)s\<rbrace>"''',
+     '''%(cast)s %(name)s_%(block)s\<rbrace>"''',
         ''' apply(rule allI, rule conseqPre, vcg)
   by (clarsimp simp: guard_simps
                      %(name)s_lift_def
@@ -1034,7 +1044,7 @@ proof_templates = {
     '''\<acute>ret__struct_%(name)s_C = \<lparr>
           %(field_eqs)s \<rparr> \<and>
         %(name)s_get_tag \<acute>ret__struct_%(name)s_C = ''' \
-     '''scast %(name)s_%(block)s\<rbrace>"''',
+     '''%(cast)s %(name)s_%(block)s\<rbrace>"''',
         '''  apply (rule allI, rule conseqPre, vcg)
   apply (clarsimp simp: guard_simps o_def mask_def shift_over_ao_dists)
   apply (rule context_conjI[THEN iffD1[OF conj_commute]],
@@ -1100,7 +1110,7 @@ proof_templates = {
         '''%(name)s_%(block)s_get_%(field)s_spec:
   "\<forall>s. \<Gamma> \<turnstile> ''' \
 '''\<lbrace>s. %(name)s_get_tag \<acute>%(name)s = ''' \
-        '''scast %(name)s_%(block)s\<rbrace>
+        '''%(cast)s %(name)s_%(block)s\<rbrace>
        \<acute>%(ret_name)s :== ''' \
        '''PROC %(name)s_%(block)s_get_%(field)s(\<acute>%(name)s)
        \<lbrace>\<acute>%(ret_name)s = ''' \
@@ -1129,7 +1139,7 @@ proof_templates = {
         '''%(name)s_%(block)s_set_%(field)s_spec:
   "\<forall>s. \<Gamma> \<turnstile> ''' \
 '''\<lbrace>s. %(name)s_get_tag \<acute>%(name)s = ''' \
-        '''scast %(name)s_%(block)s\<rbrace>
+        '''%(cast)s %(name)s_%(block)s\<rbrace>
        \<acute>ret__struct_%(name)s_C :== ''' \
     '''PROC %(name)s_%(block)s_set_%(field)s(\<acute>%(name)s, \<acute>v%(base)d)
        \<lbrace>%(name)s_%(block)s_lift \<acute>ret__struct_%(name)s_C = ''' \
@@ -1137,7 +1147,7 @@ proof_templates = {
         '''%(name)s_%(block)s_CL.%(field)s_CL ''' \
         ''':= %(sign_extend)s (\<^bsup>s\<^esup>v%(base)d AND %(mask)s)\<rparr> \<and>
         %(name)s_get_tag \<acute>ret__struct_%(name)s_C = ''' \
-     '''scast %(name)s_%(block)s\<rbrace>"''',
+     '''%(cast)s %(name)s_%(block)s\<rbrace>"''',
         '''  apply (rule allI, rule conseqPre, vcg)
   apply clarsimp
   apply (rule context_conjI[THEN iffD1[OF conj_commute]],
@@ -1406,8 +1416,25 @@ class TaggedUnion:
                     " is in a different word (%s) to the others (%s)."
                     % (self.name, hex(tag_offset // base), hex(tag_index)))
 
+        # Esp with sliced tags, tag values can become larger than signed int.
+        # Test for this case here:
+        max_signed_int = 2 ** 31 - 1
+        needs_unsigned = any([value > max_signed_int for _, value, _ in self.tags])
+
+        # on base 32 this will never trigger, but on base 64 it can happen:
+        max_unsigned_int = 2 ** 32
+        needs_full_word = any([value > max_unsigned_int for _, value, _ in self.tags])
+
+        if needs_full_word:
+            self.tag_suffix = suffix_map[base]
+        elif needs_unsigned:
+            self.tag_suffix = 'u'
+        else:
+            self.tag_suffix = ''
+
         self.tag_index = tag_index
 
+        # compute tag mask for sliced tags
         if self.sliced_tag:
             self.tag_mask = 0
             for slice in self.tag_slices:
@@ -1417,8 +1444,21 @@ class TaggedUnion:
         else:
             self.tag_mask = None  # may depend on class
 
+    def get_tag_cast(self):
+        """Return Isabelle/HOL cast from tag type to base width."""
+        if self.tag_suffix == '':
+            # signed int to base width
+            return "scast"
+        elif self.tag_suffix == 'u':
+            # unsigned int to base width, potentially widening
+            return "ucast"
+        else:
+            # tag is base width type
+            return ""
+
     def generate_hol_proofs(self, params, type_map):
         output = params.output
+        cast = self.get_tag_cast()
 
         # Add fixed simp rule for struct
         print("lemmas %(name)s_C_words_C_fl_simp[simp] = "
@@ -1428,6 +1468,7 @@ class TaggedUnion:
 
         # Generate struct field pointer proofs
         substs = {"name": self.name,
+                  "cast": cast,
                   "words": self.multiple,
                   "base": self.base}
 
@@ -1509,6 +1550,7 @@ class TaggedUnion:
                 emit_named("%s_%s_new" % (self.name, ref.name), params,
                            make_proof('empty_union_new_spec',
                                       {"name": self.name,
+                                       "cast": cast,
                                        "block": ref.name},
                                       params.sorry))
 
@@ -1516,6 +1558,7 @@ class TaggedUnion:
                                      type_map, params.toplevel_types,
                                      'ptr_empty_union_new_spec',
                                      {"name": self.name,
+                                      "cast": cast,
                                       "block": ref.name})
             else:
                 field_eq_list = []
@@ -1537,6 +1580,7 @@ class TaggedUnion:
                 emit_named("%s_%s_new" % (self.name, ref.name), params,
                            make_proof('union_new_spec',
                                       {"name": self.name,
+                                       "cast": cast,
                                        "block": ref.name,
                                        "args": ', '.join(arg_list),
                                        "field_eqs": field_eqs},
@@ -1546,6 +1590,7 @@ class TaggedUnion:
                                      type_map, params.toplevel_types,
                                      'ptr_union_new_spec',
                                      {"name": self.name,
+                                      "cast": cast,
                                       "block": ref.name,
                                       "args": ', '.join(arg_list),
                                       "field_eqs": field_eqs})
@@ -1570,6 +1615,7 @@ class TaggedUnion:
                 sign_extend = sign_extend_proof(high, self.base_bits, self.base_sign_extend)
 
                 substs = {"name":  self.name,
+                          "cast":  cast,
                           "block": ref.name,
                           "field": field,
                           "mask":  mask,
@@ -1676,9 +1722,12 @@ class TaggedUnion:
               (self.name, '\n  | '.join(constructor_exprs)),
               file=output)
 
+        cast = self.get_tag_cast()
+
         # Generate get_tag definition
-        subs = {"name":      self.name,
-                "base":      self.base}
+        subs = {"name": self.name,
+                "base": self.base,
+                "cast": cast}
 
         if self.sliced_tag:
             slice_subs = dict(subs, tag_mask=self.tag_mask, tag_index=self.tag_index)
@@ -1794,12 +1843,13 @@ class TaggedUnion:
                 value = "%s \<lparr> %s \<rparr>" % \
                     (gen_name(name, True), ','.join(field_inits))
 
-            tag_cases.append("if tag = scast %s then Some (%s)" %
-                             (gen_name(name), value))
+            tag_cases.append("if tag = %s %s then Some (%s)" %
+                             (cast, gen_name(name), value))
 
             collapse_proofs += \
                 make_proof("lift_collapse_proof",
                            {"name": self.name,
+                            "cast": cast,
                             "block": name,
                             "value": value},
                            params.sorry)
@@ -1807,6 +1857,7 @@ class TaggedUnion:
 
         print(union_lift_def_template %
               {"name": self.name,
+               "cast": cast,
                "tag_cases": '\n     else '.join(tag_cases)},
               file=output)
         print(file=output)
@@ -1822,6 +1873,7 @@ class TaggedUnion:
 
             substs = {"union": self.name,
                       "block": name,
+                      "cast": cast,
                       "generator": gen_name(name, True)}
 
             for t in [union_access_def_template, union_update_def_template]:
@@ -1853,10 +1905,10 @@ class TaggedUnion:
         print("enum %s_tag {" % self.name, file=output)
         if len(self.tags) > 0:
             for name, value, ref in self.tags[:-1]:
-                print("    %s_%s = %d," % (self.name, name, value),
+                print("    %s_%s = %d%s," % (self.name, name, value, self.tag_suffix),
                       file=output)
             name, value, ref = self.tags[-1]
-            print("    %s_%s = %d" % (self.name, name, value),
+            print("    %s_%s = %d%s" % (self.name, name, value, self.tag_suffix),
                   file=output)
         print("};", file=output)
         print("typedef enum %s_tag %s_tag_t;" %
@@ -2867,12 +2919,6 @@ if __name__ == '__main__':
     blocks = {}
     unions = {}
     _, block_map, union_map = yacc.parse(input=in_file.read(), lexer=lexer)
-    base_list = [8, 16, 32, 64]
-    # assumes that unsigned int = 32 bit on 32-bit and 64-bit platforms,
-    # and that unsigned long long = 64 bit on 64-bit platforms.
-    # Should still work fine if ull = 128 bit, but will not work
-    # if unsigned int is less than 32 bit.
-    suffix_map = {8: 'u', 16: 'u', 32: 'u', 64: 'ull'}
     for base_info, block_list in block_map.items():
         base, base_bits, base_sign_extend = base_info
         for name, b in block_list.items():
