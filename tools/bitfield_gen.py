@@ -786,11 +786,11 @@ proof_templates = {
 
     'ptr_new_spec_direct': [
         ptr_new_template(direct_ptr_name),
-        '''sorry (* ptr_new_spec_direct *)'''],
+        '''oops (* ptr_new_spec_direct *)'''],
 
     'ptr_new_spec_path': [
         ptr_new_template(path_ptr_name),
-        '''sorry (* ptr_new_spec_path *)'''],
+        '''oops (* ptr_new_spec_path *)'''],
 
 
     'get_spec': [
@@ -1002,7 +1002,7 @@ proof_templates = {
 
     'ptr_empty_union_new_spec_direct': [
         ptr_empty_union_new_template(direct_ptr_name),
-        '''sorry (* ptr_empty_union_new_spec_direct *)'''],
+        '''oops (* ptr_empty_union_new_spec_direct *)'''],
 
     'ptr_empty_union_new_spec_path': [
         ptr_empty_union_new_template(path_ptr_name),
@@ -1025,7 +1025,7 @@ proof_templates = {
 
     'ptr_union_new_spec_direct': [
         ptr_union_new_template(direct_ptr_name),
-        '''sorry (* ptr_union_new_spec_direct *)'''],
+        '''oops (* ptr_union_new_spec_direct *)'''],
 
     'ptr_union_new_spec_path': [
         ptr_union_new_template(path_ptr_name),
@@ -1131,7 +1131,7 @@ proof_templates = {
 
     'ptr_union_set_spec_direct': [
         ptr_union_set_template(direct_ptr_name),
-        '''sorry (* ptr_union_set_spec_direct *)'''],
+        '''oops (* ptr_union_set_spec_direct *)'''],
 
 
     'ptr_union_set_spec_path': [
@@ -2318,7 +2318,6 @@ class Block:
                                                       self.name] +
                                                      arg_list)},
                                   params.sorry))
-            # FIXME: ptr_new (doesn't seem to be used)
 
         field_eq_list = []
         for field in self.visible_order:
