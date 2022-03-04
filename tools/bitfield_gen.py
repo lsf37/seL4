@@ -1044,7 +1044,7 @@ proof_templates = {
   apply (erule %(name)s_lift_%(block)s[THEN subst[OF sym]]; simp?)
   apply ((intro conjI sign_extend_eq)?;
          (simp add: mask_def shift_over_ao_dists multi_shift_simps word_size
-                    word_ao_dist word_bw_assocs word_and_max_simps))?
+                    word_ao_dist word_bw_assocs word_and_max_simps %(name)s_%(block)s_def))?
   done'''],
 
     'ptr_empty_union_new_spec_direct': [
@@ -1482,7 +1482,7 @@ class TaggedUnion:
             # Generate struct_new specs
             arg_list = ["\<acute>" + field
                         for field in ref.visible_order
-                        if field != self.tagname]
+                        if field not in self.tag_slices]
 
             # Generate modifies proof
             if not params.skip_modifies:
@@ -1520,9 +1520,9 @@ class TaggedUnion:
             else:
                 field_eq_list = []
                 for field in ref.visible_order:
-                    offset, size, high = ref.field_map[field]
+                    _, size, high = ref.field_map[field]
 
-                    if field == self.tagname:
+                    if field in self.tag_slices:
                         continue
 
                     mask = field_mask_proof(self.base, self.base_bits,
@@ -1550,16 +1550,19 @@ class TaggedUnion:
                                       "args": ', '.join(arg_list),
                                       "field_eqs": field_eqs})
 
-            _, size, _ = ref.field_map[self.tagname]
-            if any([w for w in self.widths if w < size]):
-                tag_mask_helpers = ("%s_%s_tag_mask_helpers"
-                                    % (self.name, ref.name))
-            else:
+            if self.sliced_tag:
                 tag_mask_helpers = ""
+            else:
+                _, size, _ = ref.field_map[self.tagname]
+                if any([w for w in self.widths if w < size]):
+                    tag_mask_helpers = ("%s_%s_tag_mask_helpers"
+                                        % (self.name, ref.name))
+                else:
+                    tag_mask_helpers = ""
 
             # Generate get/set specs
-            for (field, offset, size, high) in ref.fields:
-                if field == self.tagname:
+            for (field, _, size, high) in ref.fields:
+                if field in self.tag_slices:
                     continue
 
                 mask = field_mask_proof(self.base, self.base_bits,
