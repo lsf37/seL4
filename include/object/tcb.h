@@ -44,6 +44,10 @@ static inline unsigned int setMR(tcb_t *receiver, word_t *receiveIPCBuffer,
 void tcbSchedEnqueue(tcb_t *tcb);
 void tcbSchedAppend(tcb_t *tcb);
 void tcbSchedDequeue(tcb_t *tcb);
+tcb_queue_t tcb_queue_prepend(tcb_queue_t queue, tcb_t *tcb);
+tcb_queue_t tcb_queue_postpend(tcb_queue_t queue, tcb_t *tcb);
+void tcb_queue_insert(tcb_t *tcb, tcb_t *after);
+tcb_queue_t tcb_queue_remove(tcb_queue_t queue, tcb_t *tcb);
 
 #ifdef CONFIG_DEBUG_BUILD
 void tcbDebugAppend(tcb_t *tcb);
@@ -51,6 +55,8 @@ void tcbDebugRemove(tcb_t *tcb);
 #endif
 #ifdef CONFIG_KERNEL_MCS
 void tcbReleaseRemove(tcb_t *tcb);
+bool_t compare_times(word_t new_time, tcb_t *tcb);
+tcb_t *compare_times_loop(word_t new_time, tcb_t *tcb);
 void tcbReleaseEnqueue(tcb_t *tcb);
 tcb_t *tcbReleaseDequeue(void);
 #endif
