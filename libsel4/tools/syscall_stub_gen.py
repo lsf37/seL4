@@ -78,7 +78,7 @@ MAX_MESSAGE_LENGTH = 64
 
 # Headers to include
 INCLUDES = [
-    'autoconf.h', 'sel4/types.h'
+    'sel4/config.h', 'sel4/types.h'
 ]
 
 TYPES = {
@@ -260,7 +260,7 @@ def init_data_types(wordsize):
     return types
 
 
-def init_arch_types(wordsize):
+def init_arch_types(wordsize, args):
     arm_smmu = [
         CapType("seL4_ARM_SIDControl", wordsize),
         CapType("seL4_ARM_SID", wordsize),
@@ -285,16 +285,15 @@ def init_arch_types(wordsize):
             Type("seL4_ARM_VMAttributes", wordsize, wordsize),
             CapType("seL4_ARM_Page", wordsize),
             CapType("seL4_ARM_PageTable", wordsize),
-            CapType("seL4_ARM_PageDirectory", wordsize),
-            CapType("seL4_ARM_PageUpperDirectory", wordsize),
-            CapType("seL4_ARM_PageGlobalDirectory", wordsize),
             CapType("seL4_ARM_VSpace", wordsize),
             CapType("seL4_ARM_ASIDControl", wordsize),
             CapType("seL4_ARM_ASIDPool", wordsize),
             CapType("seL4_ARM_VCPU", wordsize),
             CapType("seL4_ARM_IOSpace", wordsize),
             CapType("seL4_ARM_IOPageTable", wordsize),
+            CapType("seL4_ARM_SMC", wordsize),
             StructType("seL4_UserContext", wordsize * 36, wordsize),
+            StructType("seL4_ARM_SMCContext", wordsize * 8, wordsize),
         ] + arm_smmu,
 
         "arm_hyp": [
@@ -348,7 +347,8 @@ def init_arch_types(wordsize):
             CapType("seL4_X86_EPTPDPT", wordsize),
             CapType("seL4_X86_EPTPD", wordsize),
             CapType("seL4_X86_EPTPT", wordsize),
-            StructType("seL4_VCPUContext", wordsize * 7, wordsize),
+            # VCPU size needs to be configuration dependent.
+            StructType("seL4_VCPUContext", wordsize * (15 if args.x86_vtx_64bit else 7), wordsize),
             StructType("seL4_UserContext", wordsize * 20, wordsize),
         ],
         "riscv32": [
@@ -834,7 +834,12 @@ def parse_xml_file(input_file, valid_types):
     for struct in doc.getElementsByTagName("struct"):
         _struct_members = []
         struct_name = struct.getAttribute("name")
-        for members in struct.getElementsByTagName("member"):
+        struct_type = type_names.get(struct_name)
+        # Calculate the number of members to take based on the type definition
+        # We can't take all members because some objects (seL4_VCPUContext) have
+        # a config-dependent size.
+        num_struct_mems = int(struct_type.size_bits/struct_type.wordsize)
+        for members in list(struct.getElementsByTagName("member"))[0:num_struct_mems]:
             member_name = members.getAttribute("name")
             _struct_members.append(member_name)
         structs.append((struct_name, _struct_members))
@@ -954,7 +959,7 @@ def parse_xml_file(input_file, valid_types):
     return (methods, structs, api)
 
 
-def generate_stub_file(arch, wordsize, input_files, output_file, use_only_ipc_buffer, mcs):
+def generate_stub_file(arch, wordsize, input_files, output_file, use_only_ipc_buffer, mcs, args):
     """
     Generate a header file containing system call stubs for seL4.
     """
@@ -965,7 +970,7 @@ def generate_stub_file(arch, wordsize, input_files, output_file, use_only_ipc_bu
         raise Exception("Invalid architecture.")
 
     data_types = init_data_types(wordsize)
-    arch_types = init_arch_types(wordsize)
+    arch_types = init_arch_types(wordsize, args)
 
     # Parse XML
     methods = []
@@ -1064,6 +1069,8 @@ def process_args():
                             help="Word size(in bits), for the platform.")
     wsizegroup.add_argument("-c", "--cfile", dest="cfile",
                             help="Config file for Kbuild, used to get Word size.")
+    parser.add_argument("--x86-vtx-64-bit-guests", dest="x86_vtx_64bit", action="store_true", default=False,
+                        help="Whether the vtx VCPU objects need to be large enough for 64-bit guests.")
 
     parser.add_argument("files", metavar="FILES", nargs="+",
                         help="Input XML files.")
@@ -1100,7 +1107,7 @@ def main():
         sys.exit(2)
 
     # Generate the stubs.
-    generate_stub_file(args.arch, wordsize, args.files, args.output, args.buffer, args.mcs)
+    generate_stub_file(args.arch, wordsize, args.files, args.output, args.buffer, args.mcs, args)
 
 
 if __name__ == "__main__":

@@ -49,14 +49,16 @@ pointer. The thread can then be activated either by setting the
 or by separately calling the \apifunc{seL4\_TCB\_Resume}{tcb_resume} method. Both of these methods
 place the thread in a runnable state.
 
-On the master kernel, this will result in the thread immediately being added to
+In non-MCS configurations of the kernel, this will result in the thread immediately being added to
 the scheduler. On the MCS kernel, the thread will only begin running if it has a
 scheduling context object.
 
-In a SMP configuration of the kernel, the thread will resume on the core
-corresponding to the affinity of the thread. For master, this is set using
-\apifunc{seL4\_TCB\_SetAffinity}{tcb_setaffinity}, while on the MCS kernel the affinity is
-derived from the scheduling context object.
+In a SMP configuration of the kernel, the thread will resume on the node
+corresponding to the affinity of the thread. For non-MCS configurations, the
+default thread affinity is the node the thread's \obj{TCB} object was created
+on, and \apifunc{seL4\_TCB\_SetAffinity}{tcb_setaffinity} can be used to
+explicitly set the affinity. On MCS configurations, the affinity is derived
+from the scheduling context object (see \autoref{sec:sc_creation}).
 
 \subsection{Thread Deactivation}
 \label{sec:thread_deactivation}
@@ -71,6 +73,14 @@ reused or left suspended indefinitely if not needed. Threads will be
 automatically suspended when the last capability to their \obj{TCB} is
 deleted.
 % an example of which is demonstrated in \nameref{ex:second_thread}.
+
+\subsection{Affinity}
+\label{sec:thread_affinity}
+
+It is architecture and platform specific, how an affinity value maps to a
+specific node (core, hart) on a specific platform. There is no guarantee that
+affinity values are compatible across different platforms.
+
 
 \subsection{Scheduling}
 \label{sec:sched}
@@ -107,7 +117,7 @@ a scheduling context object available in order to be admitted to the scheduler.
 Access to CPU execution time is controlled through scheduling context objects.
 Scheduling contexts are configured with a tuple of
 \textit{budget}$(b)$ and \textit{period} $(p)$, both in microseconds, set by
-\apifunc{seL4\_SchedControl\_Configure}{schedcontrol_configure} (see \autoref{sec:sc_creation}).
+\apifunc{seL4\_SchedControl\_Configure\_Flags}{schedcontrol_configureflags} (see \autoref{sec:sc_creation}).
 The tuple $(b, p)$ forms an upper bound on the thread's execution -- the kernel will not permit a
 thread to run for more than $b$ out of every $p$ microseconds. However, $\frac{b}{p}$ does not
 represent a lower bound on execution, as a thread must have the highest or equal highest priority
@@ -497,7 +507,7 @@ registers, \texttt{seL4\_NumDualFunctionMonitors} will be set to \texttt{0} and
 
 \end{description}
 
-\begin{table}[h]
+\begin{table}[ht]
 \begin{tabularx}{\textwidth}{XXX}
 \toprule
 \textbf{Value sent} & \textbf{IPC buffer location} \\
@@ -596,7 +606,7 @@ the thread. The contents of the IPC message are given below.\\
 \textbf{Meaning} & \textbf{IPC buffer location} \\
 \midrule
     Program counter to restart execution at. & \ipcbloc{seL4\_VMFault\_IP} \\
-Address that caused the fault. & \ipcbloc{seL4\_VMFault\_SP} \\
+Address that caused the fault. & \ipcbloc{seL4\_VMFault\_Addr} \\
     Instruction fault (1 if the fault was caused by an instruction fetch). & \ipcbloc{seL4\_VMFault\_PrefetchFault}  \\
 Fault status register (FSR). Contains information about the cause of the fault. Architecture dependent. & \ipcbloc{seL4\_VMFault\_FSR} \\
 \bottomrule
@@ -677,8 +687,8 @@ Memory access of the guest execution mode is controlled by requiring the use of 
 Page Tables (EPT). A series of EPT related paging structure objects (\obj{EPTPML4}, \obj{EPTPDPT}, \obj{EPTPD}, \obj{EPTPT})
 exist and are manipulated in exactly the same manner as the objects for the regular virtual
 address space. Once constructed a \obj{TCB} can be given an \obj{EPTPML4} as an EPT root with \apifunc{seL4\_TCB\_SetEPTRoot}{x86_set_eptroot},
-which serves as the vspace root when executing in guest mode, with the vspace root set
-with \apifunc{seL4\_TCB\_SetSPace}{tcb_setspace} or \apifunc{seL4\_TCB\_Configure}{tcb_configure}
+which serves as the VSpace root when executing in guest mode, with the VSpace root set
+with \apifunc{seL4\_TCB\_SetSpace}{tcb_setspace} or \apifunc{seL4\_TCB\_Configure}{tcb_configure}
 continuing to provide translation when the TCB is executing in its normal mode.
 
 Direct access to I/O ports can be given to the privileged execution mode through the

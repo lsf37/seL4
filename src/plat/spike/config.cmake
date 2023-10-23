@@ -21,11 +21,13 @@ if(KernelPlatformSpike)
     config_set(KernelRiscVPlatform RISCV_PLAT "spike")
     config_set(KernelPlatformFirstHartID FIRST_HART_ID 0)
     config_set(KernelOpenSBIPlatform OPENSBI_PLATFORM "generic")
+    set(KernelRiscvUseClintMtime ON)
     if(KernelSel4ArchRiscV32)
         list(APPEND KernelDTSList "tools/dts/spike32.dts")
     else()
         list(APPEND KernelDTSList "tools/dts/spike.dts")
     endif()
+    list(APPEND KernelDTSList "src/plat/spike/overlay-spike.dts")
     declare_default_headers(
         TIMER_FREQUENCY 10000000 PLIC_MAX_NUM_INT 0
         INTERRUPT_CONTROLLER drivers/irq/riscv_plic_dummy.h
