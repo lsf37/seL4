@@ -30,6 +30,9 @@ jobs:
             session: CRefine SimplExportAndRefine
           - arch: X64
             session: CRefine
+          - arch: RISCV64
+            feature: MCS
+            session: CRefine
     # test only most recent push to PR:
     concurrency: seL4-PR-C-proofs-pr-${{ github.event.number }}-idx-${{ strategy.job-index }}
     steps:
@@ -37,6 +40,7 @@ jobs:
       uses: seL4/ci-actions/aws-proofs@master
       with:
         L4V_ARCH: ${{ matrix.arch }}
+        L4V_FEATURE: ${{ matrix.feature }}
         isa_branch: ts-2023
         session: ${{ matrix.session }}
         manifest: default.xml
