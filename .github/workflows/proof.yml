@@ -14,8 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     # run on any normal trigger when the label exists, and run when the label is added
     # don't run again when other labels are added
-    if: ${{ github.repository_owner == 'seL4' &&
-            (github.event.action != 'labeled' &&
+    if: ${{ (github.event.action != 'labeled' &&
                contains(github.event.pull_request.labels.*.name, 'proof-test') ||
              github.event.action == 'labeled' && github.event.label.name == 'proof-test') }}
     strategy:
