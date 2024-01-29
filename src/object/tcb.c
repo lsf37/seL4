@@ -111,8 +111,10 @@ tcb_queue_t tcb_queue_append(tcb_queue_t queue, tcb_t *tcb)
 void tcb_queue_insert(tcb_t *tcb, tcb_t *after)
 {
     tcb_t *before;
-
     before = after->tcbSchedPrev;
+
+    assert(before != NULL);
+    assert(before != after);
 
     tcb->tcbSchedPrev = before;
     tcb->tcbSchedNext = after;
@@ -233,7 +235,7 @@ void tcbSchedDequeue(tcb_t *tcb)
 
         thread_state_ptr_set_tcbQueued(&tcb->tcbState, false);
 
-        if (!new_queue.head) {
+        if (likely(!new_queue.head)) {
             removeFromBitmap(SMP_TERNARY(tcb->tcbAffinity, 0), dom, prio);
         }
     }
@@ -317,10 +319,7 @@ tcb_queue_t tcbEPDequeue(tcb_t *tcb, tcb_queue_t queue)
 void tcbReleaseRemove(tcb_t *tcb)
 {
     if (likely(thread_state_get_tcbInReleaseQueue(tcb->tcbState))) {
-
-        tcb_queue_t queue;
-
-        queue = NODE_STATE_ON_CORE(ksReleaseQueue, tcb->tcbAffinity);
+        tcb_queue_t queue = NODE_STATE_ON_CORE(ksReleaseQueue, tcb->tcbAffinity);
 
         if (queue.head == tcb) {
             NODE_STATE_ON_CORE(ksReprogram, tcb->tcbAffinity) = true;
@@ -337,13 +336,9 @@ static inline ticks_t PURE tcbReadyTime(tcb_t *tcb)
     return refill_head(tcb->tcbSchedContext)->rTime;
 }
 
-bool_t compare_times(word_t new_time, tcb_t *tcb)
+static inline bool_t compare_times(word_t new_time, tcb_t *tcb)
 {
-    if (tcb != NULL) {
-        return (new_time >= tcbReadyTime(tcb));
-    } else {
-        return false;
-    }
+    return tcb != NULL && new_time >= tcbReadyTime(tcb);
 }
 
 tcb_t *compare_times_loop(word_t new_time, tcb_t *tcb)
