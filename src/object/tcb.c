@@ -341,7 +341,7 @@ static inline bool_t compare_times(word_t new_time, tcb_t *tcb)
     return tcb != NULL && new_time >= tcbReadyTime(tcb);
 }
 
-tcb_t *compare_times_loop(word_t new_time, tcb_t *tcb)
+static tcb_t *compare_times_loop(word_t new_time, tcb_t *tcb)
 {
     tcb_t *after = tcb;
 
