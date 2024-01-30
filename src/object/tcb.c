@@ -359,7 +359,6 @@ void tcbReleaseEnqueue(tcb_t *tcb)
 
     ticks_t new_time;
     tcb_queue_t queue;
-    tcb_queue_t new_queue;
 
     new_time = tcbReadyTime(tcb);
     queue = NODE_STATE_ON_CORE(ksReleaseQueue, tcb->tcbAffinity);
