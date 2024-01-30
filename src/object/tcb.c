@@ -78,51 +78,6 @@ static inline void removeFromBitmap(word_t cpu, word_t dom, word_t prio)
     }
 }
 
-tcb_queue_t tcb_queue_prepend(tcb_queue_t queue, tcb_t *tcb)
-{
-    if (!queue.head) { /* Empty list */
-        queue.end = tcb;
-    } else {
-        tcb->tcbSchedNext = queue.head;
-        queue.head->tcbSchedPrev = tcb;
-    }
-
-    queue.head = tcb;
-
-    return queue;
-}
-
-tcb_queue_t tcb_queue_append(tcb_queue_t queue, tcb_t *tcb)
-{
-    if (!queue.head) { /* Empty list */
-        queue.head = tcb;
-    } else {
-        tcb->tcbSchedPrev = queue.end;
-        queue.end->tcbSchedNext = tcb;
-    }
-
-    queue.end = tcb;
-
-    return queue;
-}
-
-/* Insert a TCB into a queue immediately before another item in the queue
-   (the queue must initially contain at least two items) */
-void tcb_queue_insert(tcb_t *tcb, tcb_t *after)
-{
-    tcb_t *before;
-    before = after->tcbSchedPrev;
-
-    assert(before != NULL);
-    assert(before != after);
-
-    tcb->tcbSchedPrev = before;
-    tcb->tcbSchedNext = after;
-
-    after->tcbSchedPrev = tcb;
-    before->tcbSchedNext = tcb;
-}
-
 tcb_queue_t tcb_queue_remove(tcb_queue_t queue, tcb_t *tcb)
 {
     tcb_t *before;
