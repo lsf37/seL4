@@ -681,7 +681,8 @@ void rescheduleRequired(void)
 #ifdef CONFIG_KERNEL_MCS
 void awaken(void)
 {
-    while (unlikely(NODE_STATE(ksReleaseQueue.head) != NULL && refill_ready(NODE_STATE(ksReleaseQueue.head)->tcbSchedContext))) {
+    while (unlikely(NODE_STATE(ksReleaseQueue.head) != NULL
+                    && refill_ready(NODE_STATE(ksReleaseQueue.head)->tcbSchedContext))) {
         tcb_t *awakened = tcbReleaseDequeue();
         /* the currently running thread cannot have just woken up */
         assert(awakened != NODE_STATE(ksCurThread));

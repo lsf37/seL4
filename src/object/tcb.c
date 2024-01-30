@@ -345,7 +345,7 @@ static tcb_t *compare_times_loop(word_t new_time, tcb_t *tcb)
 {
     tcb_t *after = tcb;
 
-    while(compare_times(new_time, after)) {
+    while (compare_times(new_time, after)) {
         after = after->tcbSchedNext;
     }
 
