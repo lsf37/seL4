@@ -11,7 +11,11 @@ include(${CMAKE_CURRENT_LIST_DIR}/configs/seL4Config.cmake)
 project(seL4 C ASM)
 
 # First find our helpers
-find_file(KERNEL_HELPERS_PATH helpers.cmake PATHS tools CMAKE_FIND_ROOT_PATH_BOTH)
+find_file(
+    KERNEL_HELPERS_PATH helpers.cmake
+    PATHS tools
+    CMAKE_FIND_ROOT_PATH_BOTH
+)
 mark_as_advanced(FORCE KERNEL_HELPERS_PATH)
 include(${KERNEL_HELPERS_PATH})
 
@@ -28,7 +32,10 @@ endif()
 include(tools/internal.cmake)
 
 # Define tools used by the kernel
-set(PYTHON3 "python3" CACHE INTERNAL "")
+set(PYTHON3
+    "python3"
+    CACHE INTERNAL ""
+)
 RequireTool(CPP_GEN_PATH cpp_gen.sh)
 RequireTool(CIRCULAR_INCLUDES circular_includes.py)
 RequireTool(CONFIG_GEN_PATH config_gen.py)
@@ -127,9 +134,8 @@ elseif(KernelArchRiscV)
     string(APPEND _riscv_march "c")
 
     # Determine if GNU toolchain is used and if yes, whether GCC version >= 11.3 (implies binutils version >= 2.38)
-    if(
-        CMAKE_ASM_COMPILER_ID STREQUAL "GNU"
-        AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL "11.3"
+    if(CMAKE_ASM_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL
+                                                "11.3"
     )
         # Manually enable Zicsr and Zifencei extensions
         # This became necessary due to a change in the default ISA version in GNU binutils 2.38 which is the
@@ -143,25 +149,25 @@ else()
     message(FATAL_ERROR "unknown KernelArch '${KernelArch}'")
 endif()
 
-set(
-    BASE_ASM_FLAGS "${asm_common_flags} ${common_flags}"
+set(BASE_ASM_FLAGS
+    "${asm_common_flags} ${common_flags}"
     CACHE INTERNAL "Default ASM flags for compilation \
     (subset of flags used by the kernel build)"
 )
 
-set(
-    BASE_C_FLAGS "${c_common_flags} ${common_flags}"
+set(BASE_C_FLAGS
+    "${c_common_flags} ${common_flags}"
     CACHE INTERNAL "Default C flags for compilation \
     (subset of flags used by the kernel)"
 )
 
-set(
-    BASE_CXX_FLAGS "${cxx_common_flags} ${c_common_flags} ${common_flags}"
+set(BASE_CXX_FLAGS
+    "${cxx_common_flags} ${c_common_flags} ${common_flags}"
     CACHE INTERNAL "Default CXX flags for compilation"
 )
 
-set(
-    BASE_EXE_LINKER_FLAGS "${common_flags} ${common_exe_flags} "
+set(BASE_EXE_LINKER_FLAGS
+    "${common_flags} ${common_exe_flags} "
     CACHE INTERNAL "Default flags for linker an elf binary application"
 )
 
@@ -210,7 +216,8 @@ add_compile_options(
 #   - flags processed by GCC when invoking it as linker wrapper
 #   - flags passed by GCC to the actual linker invocation ("-Wl,<flag>").
 string(
-    APPEND CMAKE_EXE_LINKER_FLAGS
+    APPEND
+    CMAKE_EXE_LINKER_FLAGS
     # KernelCommonFlags adds "-nostdlib", it's the GCC linker step counterpart
     # for "-ffreestanding" and makes GCC not use the standard system startup
     # files or libraries. This also excludes GCC's helper library libgcc. Any
@@ -241,7 +248,9 @@ KernelCommonFlags(
     ${KernelOptimisation}
     # The following options are gcc options, it is unclear if ld options are
     # generated automatically when gcc wraps the linking step and invokes ld.
-    -nostdlib -fno-pic -fno-pie
+    -nostdlib
+    -fno-pic
+    -fno-pie
 )
 
 # Disable cloned functions. This is needed for binary verification at -O2.
@@ -280,14 +289,10 @@ if(KernelArchX86)
 elseif(KernelArchARM)
     if(KernelSel4ArchAarch64)
         KernelCommonFlags(-mgeneral-regs-only)
-        if(
-            ((CMAKE_C_COMPILER_ID STREQUAL "GNU")
-             AND (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL "10.0.0")
-             )
-            OR
-                ((CMAKE_C_COMPILER_ID STREQUAL "Clang")
-                 AND (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL "12.0.0")
-                 )
+        if(((CMAKE_C_COMPILER_ID STREQUAL "GNU") AND (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL
+                                                      "10.0.0"))
+           OR ((CMAKE_C_COMPILER_ID STREQUAL "Clang") AND (CMAKE_C_COMPILER_VERSION
+                                                           VERSION_GREATER_EQUAL "12.0.0"))
         )
             add_compile_options(-mno-outline-atomics)
         endif()
@@ -309,9 +314,8 @@ else()
     message(FATAL_ERROR "unknown KernelArch '${KernelArch}'")
 endif()
 
-if(
-    (CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    AND (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL "20.0.0")
+if((CMAKE_C_COMPILER_ID STREQUAL "Clang") AND (CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL
+                                               "20.0.0")
 )
     # To avoid clang: error: argument unused during compilation: '-c'
     add_compile_options(-Wno-unused-command-line-argument)
@@ -324,11 +328,8 @@ list(APPEND c_sources "${KernelDomainSchedule}")
 
 # Add static header includes
 include_directories(
-    "include"
-    "include/${KernelWordSize}"
-    "include/arch/${KernelArch}"
-    "include/arch/${KernelArch}/arch/${KernelWordSize}"
-    "include/plat/${KernelPlatform}"
+    "include" "include/${KernelWordSize}" "include/arch/${KernelArch}"
+    "include/arch/${KernelArch}/arch/${KernelWordSize}" "include/plat/${KernelPlatform}"
     "include/plat/${KernelPlatform}/plat/${KernelWordSize}"
 )
 
@@ -347,10 +348,8 @@ endif()
 # target_link_libraries(${target} sel4) because we don't want to inherit any
 # other build options from libsel4.
 include_directories(
-    "libsel4/include"
-    "libsel4/arch_include/${KernelArch}"
-    "libsel4/sel4_arch_include/${KernelSel4Arch}"
-    "libsel4/sel4_plat_include/${KernelPlatform}"
+    "libsel4/include" "libsel4/arch_include/${KernelArch}"
+    "libsel4/sel4_arch_include/${KernelSel4Arch}" "libsel4/sel4_plat_include/${KernelPlatform}"
     "libsel4/mode_include/${KernelWordSize}"
 )
 
@@ -368,12 +367,7 @@ include_directories($<TARGET_PROPERTY:kernel_autoconf,INTERFACE_INCLUDE_DIRECTOR
 # Target for the config / autoconf headers. This is what all the other generated headers
 # can depend upon
 add_custom_target(
-    kernel_config_headers
-    DEPENDS
-        kernel_autoconf_Gen
-        kernel_autoconf
-        kernel_Config
-        kernel_Gen
+    kernel_config_headers DEPENDS kernel_autoconf_Gen kernel_autoconf kernel_Config kernel_Gen
 )
 
 # Target for all generated headers. We start with just all the config / autoconf headers
@@ -393,8 +387,7 @@ list(APPEND gen_files_list "${gen_files2}")
 
 add_custom_command(
     OUTPUT kernel_all.c
-    COMMAND
-        "${CPP_GEN_PATH}" ${c_sources} > kernel_all.c
+    COMMAND "${CPP_GEN_PATH}" ${c_sources} > kernel_all.c
     DEPENDS "${CPP_GEN_PATH}" ${c_sources}
     COMMENT "Concatenating C files"
     VERBATIM
@@ -414,8 +407,7 @@ set(xml_headers "")
 set(header_dest "gen_headers/arch/api/invocation.h")
 gen_invocation_header(
     OUTPUT ${header_dest}
-    XML
-        ${CMAKE_CURRENT_SOURCE_DIR}/libsel4/arch_include/${KernelArch}/interfaces/object-api-arch.xml
+    XML ${CMAKE_CURRENT_SOURCE_DIR}/libsel4/arch_include/${KernelArch}/interfaces/object-api-arch.xml
     ARCH
 )
 list(APPEND xml_headers "${header_dest}")
@@ -424,8 +416,7 @@ list(APPEND gen_files_list "${header_dest}")
 set(header_dest "gen_headers/arch/api/sel4_invocation.h")
 gen_invocation_header(
     OUTPUT "${header_dest}"
-    XML
-        "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_arch_include/${KernelSel4Arch}/interfaces/object-api-sel4-arch.xml"
+    XML "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_arch_include/${KernelSel4Arch}/interfaces/object-api-sel4-arch.xml"
     SEL4ARCH
 )
 list(APPEND xml_headers "${header_dest}")
@@ -455,18 +446,14 @@ add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/invocations_all.json
     COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/generated/invocations_all.json
     COMMAND
-        "${PYTHON3}" "${INVOCATION_JSON_GEN_PATH}"
-        --gen_config ${CMAKE_CURRENT_BINARY_DIR}/gen_config/kernel/gen_config.json
-        --invocations "${invocations_absolute}"
-        --arch_invocations "${arch_invocations_absolute}"
-        --sel4_arch_invocations "${sel4_arch_invocations_absolute}"
-        --dest ${CMAKE_CURRENT_BINARY_DIR}/generated/invocations_all.json
-    DEPENDS
-        "${CMAKE_CURRENT_BINARY_DIR}/gen_config/kernel/gen_config.json"
-        "${INVOCATION_JSON_GEN_PATH}"
-        "${invocations_absolute}"
-        "${arch_invocations_absolute}"
-        "${sel4_arch_invocations_absolute}"
+        "${PYTHON3}" "${INVOCATION_JSON_GEN_PATH}" --gen_config
+        ${CMAKE_CURRENT_BINARY_DIR}/gen_config/kernel/gen_config.json --invocations
+        "${invocations_absolute}" --arch_invocations "${arch_invocations_absolute}"
+        --sel4_arch_invocations "${sel4_arch_invocations_absolute}" --dest
+        ${CMAKE_CURRENT_BINARY_DIR}/generated/invocations_all.json
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/gen_config/kernel/gen_config.json"
+            "${INVOCATION_JSON_GEN_PATH}" "${invocations_absolute}" "${arch_invocations_absolute}"
+            "${sel4_arch_invocations_absolute}"
 )
 list(APPEND gen_files_list "generated/invocations_all.json")
 
@@ -477,21 +464,13 @@ if(KernelIsMCS)
 endif()
 add_custom_command(
     OUTPUT ${syscall_dest}
-    COMMAND
-        "${XMLLINT_PATH}"
-        --noout
-        --schema "${syscall_xml_base}/syscall.xsd" "${syscall_xml_base}/syscall.xml"
-    COMMAND
-        ${CMAKE_COMMAND} -E remove -f "${syscall_dest}"
-    COMMAND
-        ${PYTHON3} "${SYSCALL_ID_GEN_PATH}"
-        --xml "${syscall_xml_base}/syscall.xml"
-        --kernel_header "${syscall_dest}" ${mcs}
-    DEPENDS
-        "${XMLLINT_PATH}"
-        "${SYSCALL_ID_GEN_PATH}"
-        "${syscall_xml_base}/syscall.xsd"
-        "${syscall_xml_base}/syscall.xml"
+    COMMAND "${XMLLINT_PATH}" --noout --schema "${syscall_xml_base}/syscall.xsd"
+            "${syscall_xml_base}/syscall.xml"
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${syscall_dest}"
+    COMMAND ${PYTHON3} "${SYSCALL_ID_GEN_PATH}" --xml "${syscall_xml_base}/syscall.xml"
+            --kernel_header "${syscall_dest}" ${mcs}
+    DEPENDS "${XMLLINT_PATH}" "${SYSCALL_ID_GEN_PATH}" "${syscall_xml_base}/syscall.xsd"
+            "${syscall_xml_base}/syscall.xml"
     COMMENT "Generate syscall invocations"
     VERBATIM
 )
@@ -522,33 +501,19 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/gen_headers")
 
 set(dummy_headers "")
 foreach(bf_dec ${bf_declarations})
-    string(
-        REPLACE
-            ":"
-            ";"
-            bf_dec
-            ${bf_dec}
-    )
+    string(REPLACE ":" ";" bf_dec ${bf_dec})
     list(GET bf_dec 0 bf_file)
     list(GET bf_dec 1 bf_gen_dir)
     get_filename_component(bf_name "${bf_file}" NAME)
-    string(
-        REPLACE
-            ".bf"
-            "_gen.h"
-            bf_target
-            "${bf_name}"
-    )
-    list(
-        APPEND
-            dummy_headers "${CMAKE_CURRENT_BINARY_DIR}/generated_prune/${bf_gen_dir}/${bf_target}"
+    string(REPLACE ".bf" "_gen.h" bf_target "${bf_name}")
+    list(APPEND dummy_headers
+         "${CMAKE_CURRENT_BINARY_DIR}/generated_prune/${bf_gen_dir}/${bf_target}"
     )
 endforeach()
 
 add_custom_command(
     OUTPUT ${dummy_headers}
-    COMMAND
-        ${CMAKE_COMMAND} -E touch ${dummy_headers}
+    COMMAND ${CMAKE_COMMAND} -E touch ${dummy_headers}
     COMMENT "Generate dummy headers for prune compilation"
 )
 
@@ -557,12 +522,8 @@ add_custom_target(dummy_header_wrapper DEPENDS ${dummy_headers})
 cppfile(
     kernel_all_pp_prune.c kernel_all_pp_prune_wrapper kernel_all.c
     EXTRA_FLAGS -CC "-I${CMAKE_CURRENT_BINARY_DIR}/generated_prune"
-    EXTRA_DEPS
-        kernel_all_c_wrapper
-        dummy_header_wrapper
-        xml_headers_target
-        kernel_config_headers
-        ${gen_files_list}
+    EXTRA_DEPS kernel_all_c_wrapper dummy_header_wrapper xml_headers_target kernel_config_headers
+               ${gen_files_list}
 )
 
 #
@@ -573,37 +534,13 @@ cppfile(
 set(bf_gen_target "kernel_bf_gen_target_1")
 
 foreach(bf_dec ${bf_declarations})
-    string(
-        REPLACE
-            ":"
-            ";"
-            bf_dec
-            ${bf_dec}
-    )
+    string(REPLACE ":" ";" bf_dec ${bf_dec})
     list(GET bf_dec 0 bf_file)
     list(GET bf_dec 1 bf_gen_dir)
     get_filename_component(bf_name "${bf_file}" NAME)
-    string(
-        REPLACE
-            ".bf"
-            "_gen.h"
-            bf_target
-            "${bf_name}"
-    )
-    string(
-        REPLACE
-            ".bf"
-            "_defs.thy"
-            defs_target
-            "${bf_name}"
-    )
-    string(
-        REPLACE
-            ".bf"
-            "_proofs.thy"
-            proofs_target
-            "${bf_name}"
-    )
+    string(REPLACE ".bf" "_gen.h" bf_target "${bf_name}")
+    string(REPLACE ".bf" "_defs.thy" defs_target "${bf_name}")
+    string(REPLACE ".bf" "_proofs.thy" proofs_target "${bf_name}")
     set(pbf_name "generated/${bf_gen_dir}/${bf_name}.pbf")
     set(pbf_target "${bf_gen_target}_pbf")
     cppfile(
@@ -622,28 +559,20 @@ foreach(bf_dec ${bf_declarations})
         "${bf_file}"
     )
     GenDefsBFTarget(
-        "${bf_gen_target}_def"
-        "generated/${bf_gen_dir}/${defs_target}"
-        "${pbf_name}"
-        "${pbf_target}"
-        "kernel_all_pp_prune.c"
-        "kernel_all_pp_prune_wrapper"
+        "${bf_gen_target}_def" "generated/${bf_gen_dir}/${defs_target}" "${pbf_name}"
+        "${pbf_target}" "kernel_all_pp_prune.c" "kernel_all_pp_prune_wrapper"
     )
     GenProofsBFTarget(
-        "${bf_gen_target}_proof"
-        "generated/${bf_gen_dir}/${proofs_target}"
-        "${pbf_name}"
-        "${pbf_target}"
-        "kernel_all_pp_prune.c"
-        "kernel_all_pp_prune_wrapper"
+        "${bf_gen_target}_proof" "generated/${bf_gen_dir}/${proofs_target}" "${pbf_name}"
+        "${pbf_target}" "kernel_all_pp_prune.c" "kernel_all_pp_prune_wrapper"
     )
     list(
         APPEND
-            theories_deps
-            "${bf_gen_target}_def"
-            "${CMAKE_CURRENT_BINARY_DIR}/generated/${bf_gen_dir}/${defs_target}"
-            "${bf_gen_target}_proof"
-            "${CMAKE_CURRENT_BINARY_DIR}/generated/${bf_gen_dir}/${proofs_target}"
+        theories_deps
+        "${bf_gen_target}_def"
+        "${CMAKE_CURRENT_BINARY_DIR}/generated/${bf_gen_dir}/${defs_target}"
+        "${bf_gen_target}_proof"
+        "${CMAKE_CURRENT_BINARY_DIR}/generated/${bf_gen_dir}/${proofs_target}"
     )
     add_dependencies(kernel_headers "${bf_gen_target}")
     list(APPEND gen_files_list "${CMAKE_CURRENT_BINARY_DIR}/generated/${bf_gen_dir}/${bf_target}")
@@ -700,8 +629,7 @@ add_custom_target(circular_includes DEPENDS circular_includes_valid)
 
 add_custom_command(
     OUTPUT kernel_all_pp.c
-    COMMAND
-        ${CMAKE_COMMAND} -E copy kernel_all.i kernel_all_pp.c
+    COMMAND ${CMAKE_COMMAND} -E copy kernel_all.i kernel_all_pp.c
     DEPENDS kernel_i_wrapper kernel_all.i
 )
 add_custom_target(kernel_all_pp_wrapper DEPENDS kernel_all_pp.c)
@@ -714,7 +642,11 @@ target_include_directories(kernel.elf PRIVATE ${config_dir})
 target_include_directories(kernel.elf PRIVATE include)
 target_include_directories(kernel.elf PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(kernel.elf PRIVATE kernel_Config kernel_autoconf)
-set_property(TARGET kernel.elf APPEND_STRING PROPERTY LINK_FLAGS " -Wl,-T ${linker_lds_path} ")
+set_property(
+    TARGET kernel.elf
+    APPEND_STRING
+    PROPERTY LINK_FLAGS " -Wl,-T ${linker_lds_path} "
+)
 set_target_properties(kernel.elf PROPERTIES LINK_DEPENDS "${linker_lds_path}")
 add_dependencies(kernel.elf circular_includes)
 
@@ -749,19 +681,18 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
         set(realpath_sel4arch "aarch32")
     endif()
     install(
-        DIRECTORY
-            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/include/"
-            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/arch_include/${KernelArch}/"
-            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_arch_include/${realpath_sel4arch}/"
-            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_plat_include/${KernelPlatform}/"
-            "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/mode_include/${KernelWordSize}/"
-            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/include/"
-            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/arch_include/${KernelArch}/"
-            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/sel4_arch_include/${realpath_sel4arch}/"
-            # The following directories install the autoconf headers
-            "${CMAKE_CURRENT_BINARY_DIR}/gen_config/"
-            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/gen_config/"
-            "${CMAKE_CURRENT_BINARY_DIR}/libsel4/autoconf/"
+        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/include/"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/arch_include/${KernelArch}/"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_arch_include/${realpath_sel4arch}/"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/sel4_plat_include/${KernelPlatform}/"
+                  "${CMAKE_CURRENT_SOURCE_DIR}/libsel4/mode_include/${KernelWordSize}/"
+                  "${CMAKE_CURRENT_BINARY_DIR}/libsel4/include/"
+                  "${CMAKE_CURRENT_BINARY_DIR}/libsel4/arch_include/${KernelArch}/"
+                  "${CMAKE_CURRENT_BINARY_DIR}/libsel4/sel4_arch_include/${realpath_sel4arch}/"
+                  # The following directories install the autoconf headers
+                  "${CMAKE_CURRENT_BINARY_DIR}/gen_config/"
+                  "${CMAKE_CURRENT_BINARY_DIR}/libsel4/gen_config/"
+                  "${CMAKE_CURRENT_BINARY_DIR}/libsel4/autoconf/"
         DESTINATION libsel4/include
         FILES_MATCHING
         PATTERN "*.h"

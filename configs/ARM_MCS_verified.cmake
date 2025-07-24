@@ -7,6 +7,15 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/ARM_verified_include.cmake)
 
-set(KernelPlatform "imx6" CACHE STRING "")
-set(KernelIsMCS ON CACHE BOOL "")
-set(KernelStaticMaxPeriodUs "(60 * 60 * MS_IN_S * US_IN_MS)" CACHE STRING "")
+set(KernelPlatform
+    "imx6"
+    CACHE STRING ""
+)
+set(KernelIsMCS
+    ON
+    CACHE BOOL ""
+)
+set(KernelStaticMaxPeriodUs
+    "(60 * 60 * MS_IN_S * US_IN_MS)"
+    CACHE STRING ""
+)

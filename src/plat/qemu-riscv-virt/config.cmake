@@ -41,13 +41,7 @@ if(KernelPlatformQEMURiscVVirt)
                 if(error)
                     message(FATAL_ERROR "Failed to determine QEMU version (${QEMU_BINARY})")
                 endif()
-                string(
-                    REGEX
-                        MATCH
-                        "[0-9]+(\\.[0-9]+)+"
-                        QEMU_VERSION
-                        "${QEMU_STDOUT_MESSAGE}"
-                )
+                string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" QEMU_VERSION "${QEMU_STDOUT_MESSAGE}")
                 if("${QEMU_VERSION}" VERSION_LESS "${MIN_QEMU_VERSION}")
                     message(
                         FATAL_ERROR
@@ -67,13 +61,7 @@ if(KernelPlatformQEMURiscVVirt)
                 # Lists are just strings with ";" as item separator, so we can
                 # just replace them by ",". The cleaner way would be using the
                 # CMake 3.12 feature: list(JOIN QEMU_MACHINE "," QEMU_MACHINE)
-                string(
-                    REPLACE
-                        ";"
-                        ","
-                        QEMU_MACHINE
-                        "${QEMU_MACHINE}"
-                )
+                string(REPLACE ";" "," QEMU_MACHINE "${QEMU_MACHINE}")
             endif()
 
             if(NOT DEFINED QEMU_CPU)
@@ -107,8 +95,7 @@ if(KernelPlatformQEMURiscVVirt)
             # a separate string, as CMake will make it a dedicated argument
             # passed to QEMU then (e.g. "-machine virt" wont be recognized,
             # but "-machine", "vir" is).
-            set(
-                QEMU_CMD
+            set(QEMU_CMD
                 "${QEMU_BINARY}"
                 "-machine"
                 "${QEMU_MACHINE}"
@@ -148,8 +135,7 @@ if(KernelPlatformQEMURiscVVirt)
         # At this point there is a DTB file, either it was passed or dumped from
         # QEMU. Create a DTS and store it in QEMU_DTS_DATA.
         execute_process(
-            COMMAND
-                dtc -q -I dtb -O dts "${QEMU_DTB}"
+            COMMAND dtc -q -I dtb -O dts "${QEMU_DTB}"
             OUTPUT_VARIABLE QEMU_DTS_DATA
             RESULT_VARIABLE error
         )
@@ -162,23 +148,11 @@ if(KernelPlatformQEMURiscVVirt)
             # Lists are just strings with ";" as item separator, so we can
             # simply replace them with something else. The cleaner way is a
             # CMake 3.12 feature: list(JOIN QEMU_CMD "\n *    " QEMU_DTS_INFO)
-            string(
-                REPLACE
-                    ";"
-                    "\n *    "
-                    QEMU_DTS_INFO
-                    "DTS of QEMU v${QEMU_VERSION} for:;${QEMU_CMD}"
+            string(REPLACE ";" "\n *    " QEMU_DTS_INFO
+                           "DTS of QEMU v${QEMU_VERSION} for:;${QEMU_CMD}"
             )
         endif()
-        file(
-            WRITE
-                "${QEMU_DTS}"
-                "/*\n"
-                " * ${QEMU_DTS_INFO}\n"
-                " */\n"
-                "\n"
-                "${QEMU_DTS_DATA}"
-        )
+        file(WRITE "${QEMU_DTS}" "/*\n" " * ${QEMU_DTS_INFO}\n" " */\n" "\n" "${QEMU_DTS_DATA}")
 
     endif()
 

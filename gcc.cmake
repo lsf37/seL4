@@ -46,38 +46,33 @@ function(FindPrefixedGCC out_var)
         endif()
     endforeach()
     if(${out_var})
-        set("${out_var}" "${${out_var}}" PARENT_SCOPE)
+        set("${out_var}"
+            "${${out_var}}"
+            PARENT_SCOPE
+        )
     else()
         message(FATAL_ERROR "Unable to find valid cross-compiling GCC")
     endif()
 endfunction(FindPrefixedGCC)
 
 if("${CROSS_COMPILER_PREFIX}" STREQUAL "")
-    if(("${arch}" STREQUAL "arm") OR ("${arch}" STREQUAL "x86") OR ("${arch}" STREQUAL "riscv"))
+    if(("${arch}" STREQUAL "arm")
+       OR ("${arch}" STREQUAL "x86")
+       OR ("${arch}" STREQUAL "riscv")
+    )
         if(${sel4_arch} STREQUAL "aarch32" OR ${sel4_arch} STREQUAL "arm_hyp")
             FindPrefixedGCC(
-                CROSS_COMPILER_PREFIX
-                "arm-linux-gnueabi-"
-                "arm-linux-gnu-"
-                "arm-none-eabi-"
+                CROSS_COMPILER_PREFIX "arm-linux-gnueabi-" "arm-linux-gnu-" "arm-none-eabi-"
             )
         elseif(${sel4_arch} STREQUAL "aarch64")
             FindPrefixedGCC(
-                CROSS_COMPILER_PREFIX
-                "aarch64-linux-gnu-"
-                "aarch64-unknown-linux-gnu-"
-                "aarch64-none-linux-gnu-"
-                "aarch64-none-elf-"
-                "aarch64-elf-"
+                CROSS_COMPILER_PREFIX "aarch64-linux-gnu-" "aarch64-unknown-linux-gnu-"
+                "aarch64-none-linux-gnu-" "aarch64-none-elf-" "aarch64-elf-"
             )
         elseif(${arch} STREQUAL "riscv")
             FindPrefixedGCC(
-                CROSS_COMPILER_PREFIX
-                "riscv64-unknown-linux-gnu-"
-                "riscv64-unknown-elf-"
-                "riscv64-none-elf-"
-                "riscv64-elf-"
-                "riscv64-linux-gnu-"
+                CROSS_COMPILER_PREFIX "riscv64-unknown-linux-gnu-" "riscv64-unknown-elf-"
+                "riscv64-none-elf-" "riscv64-elf-" "riscv64-linux-gnu-"
             )
         endif()
     else()
@@ -86,38 +81,26 @@ if("${CROSS_COMPILER_PREFIX}" STREQUAL "")
         # understood the following arguments: ARM, AARCH32, AARCH32HF, AARCH64, RISCV32, RISCV64, APPLE
         if(AARCH32 OR ARM)
             FindPrefixedGCC(
-                CROSS_COMPILER_PREFIX
-                "arm-linux-gnueabi-"
-                "arm-linux-gnu-"
-                "arm-none-eabi-"
+                CROSS_COMPILER_PREFIX "arm-linux-gnueabi-" "arm-linux-gnu-" "arm-none-eabi-"
             )
             if(ARM)
                 message("ARM flag is deprecated, please use AARCH32")
             endif()
         elseif(AARCH64)
             FindPrefixedGCC(
-                CROSS_COMPILER_PREFIX
-                "aarch64-linux-gnu-"
-                "aarch64-unknown-linux-gnu-"
-                "aarch64-none-linux-gnu-"
-                "aarch64-none-elf-"
-                "aarch64-elf-"
+                CROSS_COMPILER_PREFIX "aarch64-linux-gnu-" "aarch64-unknown-linux-gnu-"
+                "aarch64-none-linux-gnu-" "aarch64-none-elf-" "aarch64-elf-"
             )
         elseif(RISCV32 OR RISCV64)
             FindPrefixedGCC(
-                CROSS_COMPILER_PREFIX
-                "riscv64-unknown-linux-gnu-"
-                "riscv64-unknown-elf-"
-                "riscv64-none-elf-"
-                "riscv64-elf-"
-                "riscv64-linux-gnu-"
+                CROSS_COMPILER_PREFIX "riscv64-unknown-linux-gnu-" "riscv64-unknown-elf-"
+                "riscv64-none-elf-" "riscv64-elf-" "riscv64-linux-gnu-"
             )
         endif()
     endif()
     if(AARCH32HF)
         FindPrefixedGCC(
-            CROSS_COMPILER_PREFIX
-            "arm-linux-gnueabihf-"
+            CROSS_COMPILER_PREFIX "arm-linux-gnueabihf-"
             "arm-linux-gnu-" # Later checks should confirm this has `hardfp`
         )
     endif()

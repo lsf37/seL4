@@ -44,7 +44,10 @@ if(KernelPlatExynos5)
     endif()
 
     if(NOT KernelPlatformExynos5422)
-        set(KernelHardwareDebugAPIUnsupported ON CACHE INTERNAL "")
+        set(KernelHardwareDebugAPIUnsupported
+            ON
+            CACHE INTERNAL ""
+        )
     endif()
 
     list(APPEND KernelDTSList "tools/dts/${KernelARMPlatform}.dts")
@@ -62,6 +65,5 @@ if(KernelPlatExynos5)
 endif()
 
 add_sources(
-    DEP "KernelPlatExynos5"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatExynos5" CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
 )

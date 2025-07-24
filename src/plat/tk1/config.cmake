@@ -29,8 +29,8 @@ if(KernelPlatformTK1)
 endif()
 
 add_sources(
-    DEP "KernelPlatformTK1"
-    CFILES src/plat/tk1/machine/smmu.c src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformTK1" CFILES src/plat/tk1/machine/smmu.c src/arch/arm/machine/gic_v2.c
+                                   src/arch/arm/machine/l2c_nop.c
 )
 
 add_bf_source_old("KernelPlatformTK1" "hardware.bf" "include/plat/tk1" "plat/machine")

@@ -28,6 +28,6 @@ if(KernelPlatformTqma8xqp1gb)
 endif()
 
 add_sources(
-    DEP "KernelPlatformTqma8xqp1gb"
-    CFILES src/arch/arm/machine/gic_v3.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformTqma8xqp1gb" CFILES src/arch/arm/machine/gic_v3.c
+                                           src/arch/arm/machine/l2c_nop.c
 )

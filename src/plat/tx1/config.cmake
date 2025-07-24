@@ -27,6 +27,5 @@ if(KernelPlatformTx1)
 endif()
 
 add_sources(
-    DEP "KernelPlatformTx1"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformTx1" CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
 )

@@ -6,4 +6,8 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 
-register_driver(compatibility_strings "arm,mmu-500" PREFIX src/drivers/smmu CFILES "smmuv2.c")
+register_driver(
+    compatibility_strings "arm,mmu-500"
+    PREFIX src/drivers/smmu
+    CFILES "smmuv2.c"
+)

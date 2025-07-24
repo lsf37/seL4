@@ -13,31 +13,25 @@ endif()
 add_sources(
     DEP "KernelPlatPC99"
     PREFIX src/plat/pc99/machine
-    CFILES
-        acpi.c
-        hardware.c
-        pic.c
-        ioapic.c
-        pit.c
-        io.c
-        intel-vtd.c
+    CFILES acpi.c
+           hardware.c
+           pic.c
+           ioapic.c
+           pit.c
+           io.c
+           intel-vtd.c
 )
 
 add_bf_source_old(
-    "KernelSel4ArchX86_64"
-    "hardware.bf"
-    "include/plat/pc99/plat/64"
-    "plat_mode/machine"
+    "KernelSel4ArchX86_64" "hardware.bf" "include/plat/pc99/plat/64" "plat_mode/machine"
 )
 add_bf_source_old(
-    "KernelSel4ArchIA32"
-    "hardware.bf"
-    "include/plat/pc99/plat/32"
-    "plat_mode/machine"
+    "KernelSel4ArchIA32" "hardware.bf" "include/plat/pc99/plat/32" "plat_mode/machine"
 )
 
 config_string(
-    KernelPC99TSCFrequency PC99_TSC_FREQUENCY
+    KernelPC99TSCFrequency
+    PC99_TSC_FREQUENCY
     "Provide a static definition of the TSC frequency (in Hz). \
     If this isn't set then the boot code will try and read the frequency from a MSR. \
     If it can't calculate the frequency from a MSR then it will estimate it from running the PIT for about 200ms."

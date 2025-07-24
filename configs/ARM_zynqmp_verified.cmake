@@ -7,4 +7,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/ARM_verified_include.cmake)
 
-set(KernelPlatform "zynqmp" CACHE STRING "")
+set(KernelPlatform
+    "zynqmp"
+    CACHE STRING ""
+)

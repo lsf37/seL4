@@ -7,4 +7,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/AARCH64_verified_include.cmake)
 
-set(KernelPlatform "odroidc4" CACHE STRING "")
+set(KernelPlatform
+    "odroidc4"
+    CACHE STRING ""
+)

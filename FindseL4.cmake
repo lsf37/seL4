@@ -4,9 +4,18 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-set(KERNEL_PATH "${CMAKE_CURRENT_LIST_DIR}" CACHE STRING "")
-set(KERNEL_HELPERS_PATH "${CMAKE_CURRENT_LIST_DIR}/tools/helpers.cmake" CACHE STRING "")
-set(KERNEL_CONFIG_PATH "${CMAKE_CURRENT_LIST_DIR}/configs/seL4Config.cmake" CACHE STRING "")
+set(KERNEL_PATH
+    "${CMAKE_CURRENT_LIST_DIR}"
+    CACHE STRING ""
+)
+set(KERNEL_HELPERS_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/tools/helpers.cmake"
+    CACHE STRING ""
+)
+set(KERNEL_CONFIG_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/configs/seL4Config.cmake"
+    CACHE STRING ""
+)
 mark_as_advanced(KERNEL_PATH KERNEL_HELPERS_PATH KERNEL_CONFIG_PATH)
 
 macro(sel4_import_kernel)
@@ -23,9 +32,5 @@ endmacro()
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(
-    seL4
-    DEFAULT_MSG
-    KERNEL_PATH
-    KERNEL_HELPERS_PATH
-    KERNEL_CONFIG_PATH
+    seL4 DEFAULT_MSG KERNEL_PATH KERNEL_HELPERS_PATH KERNEL_CONFIG_PATH
 )

@@ -6,4 +6,7 @@
 #
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/AARCH64_verified_include.cmake)
-set(KernelPlatform "tqma8xqp1gb" CACHE STRING "")
+set(KernelPlatform
+    "tqma8xqp1gb"
+    CACHE STRING ""
+)

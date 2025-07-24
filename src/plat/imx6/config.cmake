@@ -9,15 +9,8 @@ declare_platform(imx6 KernelPlatImx6 PLAT_IMX6 KernelSel4ArchAarch32)
 
 # disable platform specific settings by default in cache, will be enabled below
 # if active
-foreach(
-    var
-    IN
-    ITEMS
-    KernelPlatformSabre
-    KernelPlatformWandQ
-    KernelPlatformNitrogen6SX
-    KernelPlatImx6dq
-    KernelPlatImx6sx
+foreach(var IN ITEMS KernelPlatformSabre KernelPlatformWandQ KernelPlatformNitrogen6SX
+                     KernelPlatImx6dq KernelPlatImx6sx
 )
     unset(${var} CACHE)
     set(${var} OFF)
@@ -47,7 +40,10 @@ if(KernelPlatImx6)
     declare_seL4_arch(aarch32)
     set(KernelArmCortexA9 ON)
     set(KernelArchArmV7a ON)
-    set(KernelArmMach "imx" CACHE INTERNAL "")
+    set(KernelArmMach
+        "imx"
+        CACHE INTERNAL ""
+    )
     list(APPEND KernelDTSList "tools/dts/${KernelARMPlatform}.dts")
     list(APPEND KernelDTSList "src/plat/imx6/overlay-${KernelARMPlatform}.dts")
 
@@ -76,6 +72,5 @@ if(KernelPlatImx6)
 endif()
 
 add_sources(
-    DEP "KernelPlatImx6"
-    CFILES src/arch/arm/machine/l2c_310.c src/arch/arm/machine/gic_v2.c
+    DEP "KernelPlatImx6" CFILES src/arch/arm/machine/l2c_310.c src/arch/arm/machine/gic_v2.c
 )

@@ -7,5 +7,11 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/AARCH64_verified_include.cmake)
 
-set(KernelPlatform "zynqmp" CACHE STRING "")
-set(KernelARMPlatform "ultra96v2" CACHE STRING "")
+set(KernelPlatform
+    "zynqmp"
+    CACHE STRING ""
+)
+set(KernelARMPlatform
+    "ultra96v2"
+    CACHE STRING ""
+)

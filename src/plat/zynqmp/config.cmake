@@ -7,11 +7,8 @@
 declare_platform(zynqmp KernelPlatformZynqmp PLAT_ZYNQMP KernelArchARM)
 
 set(c_configs PLAT_ZYNQMP_ZCU102 PLAT_ZYNQMP_ULTRA96 PLAT_ZYNQMP_ULTRA96V2)
-set(
-    cmake_configs
-    KernelPlatformZynqmpZcu102
-    KernelPlatformZynqmpUltra96
-    KernelPlatformZynqmpUltra96v2
+set(cmake_configs KernelPlatformZynqmpZcu102 KernelPlatformZynqmpUltra96
+                  KernelPlatformZynqmpUltra96v2
 )
 set(plat_lists zcu102 ultra96 ultra96v2)
 foreach(config IN LISTS cmake_configs)
@@ -19,7 +16,10 @@ foreach(config IN LISTS cmake_configs)
 endforeach()
 
 if(KernelPlatformZynqmp)
-    set(KernelHardwareDebugAPIUnsupported ON CACHE INTERNAL "")
+    set(KernelHardwareDebugAPIUnsupported
+        ON
+        CACHE INTERNAL ""
+    )
     declare_seL4_arch(aarch64 aarch32 arm_hyp)
     check_platform_and_fallback_to_default(KernelARMPlatform "zcu102")
 
@@ -66,6 +66,5 @@ if(KernelPlatformZynqmp)
 endif()
 
 add_sources(
-    DEP "KernelPlatformZynqmp"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformZynqmp" CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
 )

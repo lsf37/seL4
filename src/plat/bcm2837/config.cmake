@@ -12,7 +12,10 @@ if(KernelPlatformRpi3)
     set(KernelArmCortexA53 ON)
     set(KernelArchArmV8a ON)
     config_set(KernelARMPlatform ARM_PLAT rpi3)
-    set(KernelArmMachFeatureModifiers "+crc" CACHE INTERNAL "")
+    set(KernelArmMachFeatureModifiers
+        "+crc"
+        CACHE INTERNAL ""
+    )
     list(APPEND KernelDTSList "tools/dts/rpi3.dts")
     list(APPEND KernelDTSList "src/plat/bcm2837/overlay-rpi3.dts")
 
@@ -29,6 +32,5 @@ if(KernelPlatformRpi3)
 endif()
 
 add_sources(
-    DEP "KernelPlatformRpi3"
-    CFILES src/plat/bcm2837/machine/intc.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformRpi3" CFILES src/plat/bcm2837/machine/intc.c src/arch/arm/machine/l2c_nop.c
 )

@@ -41,12 +41,9 @@ if(KernelPlatformQEMUArmVirt)
         # If both ARM_CPU and KernelSel4Arch are set, conflicting values will be
         # detected eventually. Note that the KernelSel4Archxxx variables are not
         # set up here, because declare_seL4_arch() has not been called yet.
-        set(
-            arch_cpu_mapping # element format: "KernelSel4Arch:ARM_CPU"
+        set(arch_cpu_mapping # element format: "KernelSel4Arch:ARM_CPU"
             ":cortex-a53" # used if KernelSel4Arch is empty or not set
-            "aarch64:cortex-a53"
-            "arm_hyp:cortex-a15"
-            "aarch32:cortex-a15"
+            "aarch64:cortex-a53" "arm_hyp:cortex-a15" "aarch32:cortex-a15"
         )
         if(NOT ";${arch_cpu_mapping};" MATCHES ";${KernelSel4Arch}:([^;]*);")
             message(FATAL_ERROR "unsupported KernelSel4Arch: '${KernelSel4Arch}'")
@@ -104,13 +101,7 @@ if(KernelPlatformQEMUArmVirt)
                 if(error)
                     message(FATAL_ERROR "Failed to determine QEMU version (${QEMU_BINARY})")
                 endif()
-                string(
-                    REGEX
-                        MATCH
-                        "[0-9]+(\\.[0-9]+)+"
-                        QEMU_VERSION
-                        "${QEMU_STDOUT_MESSAGE}"
-                )
+                string(REGEX MATCH "[0-9]+(\\.[0-9]+)+" QEMU_VERSION "${QEMU_STDOUT_MESSAGE}")
                 if("${QEMU_VERSION}" VERSION_LESS "${MIN_QEMU_VERSION}")
                     message(
                         FATAL_ERROR
@@ -134,13 +125,7 @@ if(KernelPlatformQEMUArmVirt)
                 # Lists are just strings with ";" as item separator, so we can
                 # just replace them by ",". The cleaner way would be using the
                 # CMake 3.12 feature: list(JOIN QEMU_MACHINE "," QEMU_MACHINE)
-                string(
-                    REPLACE
-                        ";"
-                        ","
-                        QEMU_MACHINE
-                        "${QEMU_MACHINE}"
-                )
+                string(REPLACE ";" "," QEMU_MACHINE "${QEMU_MACHINE}")
 
             endif()
 
@@ -171,8 +156,7 @@ if(KernelPlatformQEMUArmVirt)
             # a separate string, as CMake will make it a dedicated argument
             # passed to QEMU then (e.g. "-machine virt" wont be recognized,
             # but "-machine", "vir" is).
-            set(
-                QEMU_CMD
+            set(QEMU_CMD
                 "${QEMU_BINARY}"
                 "-machine"
                 "${QEMU_MACHINE}"
@@ -210,8 +194,7 @@ if(KernelPlatformQEMUArmVirt)
         # At this point there is a DTB file, either it was passed or dumped from
         # QEMU. Create a DTS and store it in QEMU_DTS_DATA.
         execute_process(
-            COMMAND
-                dtc -q -I dtb -O dts "${QEMU_DTB}"
+            COMMAND dtc -q -I dtb -O dts "${QEMU_DTB}"
             OUTPUT_VARIABLE QEMU_DTS_DATA
             RESULT_VARIABLE error
         )
@@ -224,23 +207,11 @@ if(KernelPlatformQEMUArmVirt)
             # Lists are just strings with ";" as item separator, so we can
             # simply replace them with something else. The cleaner way is a
             # CMake 3.12 feature: list(JOIN QEMU_CMD "\n *    " QEMU_DTS_INFO)
-            string(
-                REPLACE
-                    ";"
-                    "\n *    "
-                    QEMU_DTS_INFO
-                    "DTS of QEMU v${QEMU_VERSION} for:;${QEMU_CMD}"
+            string(REPLACE ";" "\n *    " QEMU_DTS_INFO
+                           "DTS of QEMU v${QEMU_VERSION} for:;${QEMU_CMD}"
             )
         endif()
-        file(
-            WRITE
-                "${QEMU_DTS}"
-                "/*\n"
-                " * ${QEMU_DTS_INFO}\n"
-                " */\n"
-                "\n"
-                "${QEMU_DTS_DATA}"
-        )
+        file(WRITE "${QEMU_DTS}" "/*\n" " * ${QEMU_DTS_INFO}\n" " */\n" "\n" "${QEMU_DTS_DATA}")
 
     endif()
 
@@ -268,8 +239,8 @@ if(KernelPlatformQEMUArmVirt)
 endif()
 
 add_sources(
-    DEP "KernelPlatformQEMUArmVirt"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformQEMUArmVirt" CFILES src/arch/arm/machine/gic_v2.c
+                                           src/arch/arm/machine/l2c_nop.c
 )
 
 config_string(

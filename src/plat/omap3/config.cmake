@@ -10,7 +10,10 @@ if(KernelPlatformOMAP3)
     declare_seL4_arch(aarch32)
     set(KernelArmCortexA8 ON)
     set(KernelArchArmV7a ON)
-    set(KernelHardwareDebugAPIUnsupported ON CACHE INTERNAL "")
+    set(KernelHardwareDebugAPIUnsupported
+        ON
+        CACHE INTERNAL ""
+    )
     config_set(KernelARMPlatform ARM_PLAT omap3)
     config_set(KernelArmMach MACH "omap")
     list(APPEND KernelDTSList "tools/dts/omap3.dts")
@@ -27,6 +30,6 @@ if(KernelPlatformOMAP3)
 endif()
 
 add_sources(
-    DEP "KernelPlatformOMAP3"
-    CFILES src/plat/omap3/machine/hardware.c src/plat/omap3/machine/l2cache.c
+    DEP "KernelPlatformOMAP3" CFILES src/plat/omap3/machine/hardware.c
+                                     src/plat/omap3/machine/l2cache.c
 )
