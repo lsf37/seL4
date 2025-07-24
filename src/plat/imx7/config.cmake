@@ -12,7 +12,10 @@ if(KernelPlatImx7)
     set(KernelArmCortexA7 ON)
     set(KernelArchArmV7a ON)
     config_set(KernelARMPlatform ARM_PLAT imx7sabre)
-    set(KernelArmMach "imx" CACHE INTERNAL "")
+    set(KernelArmMach
+        "imx"
+        CACHE INTERNAL ""
+    )
     list(APPEND KernelDTSList "tools/dts/imx7sabre.dts")
     list(APPEND KernelDTSList "src/plat/imx7/overlay-imx7sabre.dts")
     declare_default_headers(
@@ -30,6 +33,5 @@ else()
 endif()
 
 add_sources(
-    DEP "KernelPlatImx7"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatImx7" CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
 )

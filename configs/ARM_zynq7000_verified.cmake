@@ -7,4 +7,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/ARM_verified_include.cmake)
 
-set(KernelPlatform "zynq7000" CACHE STRING "")
+set(KernelPlatform
+    "zynq7000"
+    CACHE STRING ""
+)

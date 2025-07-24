@@ -7,4 +7,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/ARM_verified_include.cmake)
 
-set(KernelPlatform "tk1" CACHE STRING "")
+set(KernelPlatform
+    "tk1"
+    CACHE STRING ""
+)

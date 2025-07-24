@@ -62,7 +62,9 @@ foreach(match_string IN ITEMS "arm,armv7-timer" "arm,armv8-timer")
 endforeach()
 
 config_option(
-    KernelArmExportPCNTUser EXPORT_PCNT_USER "PL0 access to generic timer CNTPCT and CNTFRQ. \
+    KernelArmExportPCNTUser
+    EXPORT_PCNT_USER
+    "PL0 access to generic timer CNTPCT and CNTFRQ. \
     Grant user access to physical counter and counter \
     frequency registers of the generic timer. \
     WARNING: selecting this option opens a timing \
@@ -72,7 +74,9 @@ config_option(
 )
 
 config_option(
-    KernelArmExportVCNTUser EXPORT_VCNT_USER "PL0 access to generic timer CNTVCT and CNTFRQ. \
+    KernelArmExportVCNTUser
+    EXPORT_VCNT_USER
+    "PL0 access to generic timer CNTVCT and CNTFRQ. \
     Grant user access to virtual counter and counter \
     frequency registers of the generic timer. \
     WARNING: selecting this option opens a timing \
@@ -82,7 +86,9 @@ config_option(
 )
 
 config_option(
-    KernelArmExportPTMRUser EXPORT_PTMR_USER "PL0 access to generic timer CNTP_CTL and CNTP_CVAL. \
+    KernelArmExportPTMRUser
+    EXPORT_PTMR_USER
+    "PL0 access to generic timer CNTP_CTL and CNTP_CVAL. \
     Grant user access to physical timer registers of the generic timer. \
     WARNING: selecting this option opens a storage channel and allows threads to easily \
     corrupt these registers for each other, this should only be used for \
@@ -92,7 +98,9 @@ config_option(
 )
 
 config_option(
-    KernelArmExportVTMRUser EXPORT_VTMR_USER "PL0 access to generic timer CNTV_CTL and CNTV_CVAL. \
+    KernelArmExportVTMRUser
+    EXPORT_VTMR_USER
+    "PL0 access to generic timer CNTV_CTL and CNTV_CVAL. \
     Grant user access to virtual timer registers of the generic timer. \
     WARNING: selecting this option opens a storage channel and allows threads to easily \
     corrupt these registers for each other, this should only be used for \
@@ -102,7 +110,8 @@ config_option(
 )
 
 config_option(
-    KernelArmVtimerUpdateVOffset VTIMER_UPDATE_VOFFSET
+    KernelArmVtimerUpdateVOffset
+    VTIMER_UPDATE_VOFFSET
     "When set the kernel will update the VOFFSET \
     register of a VCPU when restoring it so that its view of Virtual time hasn't increased while it \
     was suspended.  When unset the VOFFSET won't be updated other than by the read and write register api."

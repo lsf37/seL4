@@ -30,6 +30,5 @@ if(KernelPlatformAPQ8064)
 endif()
 
 add_sources(
-    DEP "KernelPlatformAPQ8064"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformAPQ8064" CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
 )

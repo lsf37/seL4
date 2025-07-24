@@ -7,4 +7,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/RISCV64_verified_include.cmake)
 
-set(KernelPlatform "hifive" CACHE STRING "")
+set(KernelPlatform
+    "hifive"
+    CACHE STRING ""
+)

@@ -29,6 +29,6 @@ if(KernelPlatformAllwinnerA20)
 endif()
 
 add_sources(
-    DEP "KernelPlatformAllwinnerA20"
-    CFILES src/plat/allwinnerA20/machine/l2cache.c src/arch/arm/machine/gic_v2.c
+    DEP "KernelPlatformAllwinnerA20" CFILES src/plat/allwinnerA20/machine/l2cache.c
+                                            src/arch/arm/machine/gic_v2.c
 )

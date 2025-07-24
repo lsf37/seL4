@@ -11,7 +11,10 @@ if(KernelPlatformOdroidc2)
     set(KernelArmCortexA53 ON)
     set(KernelArchArmV8a ON)
     config_set(KernelARMPlatform ARM_PLAT odroidc2)
-    set(KernelArmMachFeatureModifiers "+crc" CACHE INTERNAL "")
+    set(KernelArmMachFeatureModifiers
+        "+crc"
+        CACHE INTERNAL ""
+    )
     list(APPEND KernelDTSList "tools/dts/odroidc2.dts")
     list(APPEND KernelDTSList "src/plat/odroidc2/overlay-odroidc2.dts")
     declare_default_headers(
@@ -28,6 +31,6 @@ if(KernelPlatformOdroidc2)
 endif()
 
 add_sources(
-    DEP "KernelPlatformOdroidc2"
-    CFILES src/arch/arm/machine/gic_v2.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformOdroidc2" CFILES src/arch/arm/machine/gic_v2.c
+                                        src/arch/arm/machine/l2c_nop.c
 )

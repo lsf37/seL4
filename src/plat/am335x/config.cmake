@@ -6,11 +6,8 @@
 
 declare_platform(am335x KernelPlatformAM335X PLAT_AM335X KernelSel4ArchAarch32)
 set(c_configs PLAT_AM335X_BONEBLACK PLAT_AM335X_BONEBLUE PLAT_AM335X_BONE)
-set(
-    cmake_configs
-    KernelPlatformAM335XBoneBlack
-    KernelPlatformAM335XBoneBlue
-    KernelPlatformAM335XBone
+set(cmake_configs KernelPlatformAM335XBoneBlack KernelPlatformAM335XBoneBlue
+                  KernelPlatformAM335XBone
 )
 set(plat_lists am335x-boneblack am335x-boneblue am335x-bone)
 foreach(config IN LISTS cmake_configs)
@@ -20,7 +17,10 @@ endforeach()
 if(KernelPlatformAM335X)
     declare_seL4_arch(aarch32)
 
-    set(KernelHardwareDebugAPIUnsupported ON CACHE INTERNAL "")
+    set(KernelHardwareDebugAPIUnsupported
+        ON
+        CACHE INTERNAL ""
+    )
 
     set(KernelArmCortexA8 ON)
     set(KernelArchArmV7a ON)
@@ -55,6 +55,6 @@ if(KernelPlatformAM335X)
 endif()
 
 add_sources(
-    DEP "KernelPlatformAM335X"
-    CFILES src/plat/am335x/machine/hardware.c src/plat/am335x/machine/l2cache.c
+    DEP "KernelPlatformAM335X" CFILES src/plat/am335x/machine/hardware.c
+                                      src/plat/am335x/machine/l2cache.c
 )

@@ -23,6 +23,5 @@ if(KernelPlatformFVP)
 endif()
 
 add_sources(
-    DEP "KernelPlatformFVP"
-    CFILES src/arch/arm/machine/l2c_nop.c src/arch/arm/machine/gic_v3.c
+    DEP "KernelPlatformFVP" CFILES src/arch/arm/machine/l2c_nop.c src/arch/arm/machine/gic_v3.c
 )

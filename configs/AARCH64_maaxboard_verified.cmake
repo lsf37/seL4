@@ -7,4 +7,7 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/include/AARCH64_verified_include.cmake)
 
-set(KernelPlatform "maaxboard" CACHE STRING "")
+set(KernelPlatform
+    "maaxboard"
+    CACHE STRING ""
+)

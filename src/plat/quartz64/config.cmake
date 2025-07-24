@@ -26,6 +26,6 @@ if(KernelPlatformQuartz64)
 endif()
 
 add_sources(
-    DEP "KernelPlatformQuartz64"
-    CFILES src/arch/arm/machine/gic_v3.c src/arch/arm/machine/l2c_nop.c
+    DEP "KernelPlatformQuartz64" CFILES src/arch/arm/machine/gic_v3.c
+                                        src/arch/arm/machine/l2c_nop.c
 )
