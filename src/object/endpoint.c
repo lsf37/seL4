@@ -102,12 +102,13 @@ void sendIPC(bool_t blocking, bool_t do_call, word_t badge,
             schedContext_donate(thread->tcbSchedContext, dest);
         }
 
-        /* blocked threads should have enough budget to get out of the kernel */
-        assert(dest->tcbSchedContext == NULL || refill_sufficient(dest->tcbSchedContext, 0));
-        assert(dest->tcbSchedContext == NULL || refill_ready(dest->tcbSchedContext));
         setThreadState(dest, ThreadState_Running);
-        if (sc_sporadic(dest->tcbSchedContext) && dest->tcbSchedContext != NODE_STATE(ksCurSC)) {
-            refill_unblock_check(dest->tcbSchedContext);
+        sched_context_t *dest_sc = dest->tcbSchedContext;
+        /* blocked threads should have enough budget to get out of the kernel */
+        assert(dest_sc == NULL || refill_sufficient(dest_sc, 0));
+        assert(dest_sc == NULL || refill_ready(dest_sc));
+        if (sc_sporadic(dest_sc) && dest_sc != NODE_STATE(ksCurSC)) {
+            refill_unblock_check(dest_sc);
         }
         possibleSwitchTo(dest);
 #else
