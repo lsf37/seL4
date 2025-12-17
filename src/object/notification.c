@@ -248,6 +248,7 @@ void receiveSignal(tcb_t *thread, cap_t cap, bool_t isBlocking)
     }
 }
 
+#ifdef CONFIG_KERNEL_MCS
 static inline void restartNTFNQueuedThread(tcb_t *thread, notification_t *ntfnPtr)
 {
     tcbNTFNDequeue(thread, ntfnPtr);
@@ -265,6 +266,7 @@ static inline void restartNTFNQueuedThread(tcb_t *thread, notification_t *ntfnPt
     }
     possibleSwitchTo(thread);
 }
+#endif
 
 void cancelAllSignals(notification_t *ntfnPtr)
 {

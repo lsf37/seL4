@@ -417,7 +417,6 @@ static inline void restart_thread_if_no_fault(tcb_t *thread)
         setThreadState(thread, ThreadState_Inactive);
     }
 }
-#endif
 
 static inline void restartEPQueuedThread(tcb_t *thread, endpoint_t *epptr)
 {
@@ -430,6 +429,7 @@ static inline void restartEPQueuedThread(tcb_t *thread, endpoint_t *epptr)
     }
     restart_thread_if_no_fault(thread);
 }
+#endif
 
 void cancelAllIPC(endpoint_t *epptr)
 {
@@ -469,6 +469,7 @@ void cancelAllIPC(endpoint_t *epptr)
     }
 }
 
+#ifdef CONFIG_KERNEL_MCS
 static inline void restartBadgedThread(tcb_t *thread, endpoint_t *epptr, word_t badge)
 {
     word_t b = thread_state_ptr_get_blockingIPCBadge(&thread->tcbState);
@@ -480,6 +481,7 @@ static inline void restartBadgedThread(tcb_t *thread, endpoint_t *epptr, word_t 
         restart_thread_if_no_fault(thread);
     }
 }
+#endif
 
 void cancelBadgedSends(endpoint_t *epptr, word_t badge)
 {
