@@ -193,7 +193,7 @@ void receiveIPC(tcb_t *thread, cap_t cap, bool_t isBlocking)
 
                 /* Place calling thread in endpoint queue */
 #ifdef CONFIG_KERNEL_MCS
-                tcbEPAppend(thread,epptr, true);
+                tcbEPAppend(thread, epptr, true);
 #else
                 tcb_queue_t queue;
                 queue = ep_ptr_get_queue(epptr);
@@ -551,7 +551,7 @@ void tcbEPAppend(tcb_t *thread, endpoint_t *epptr, bool_t isRecv)
         if (isRecv) {
             endpoint_ptr_set_state(epptr, EPState_Recv);
         } else {
-              endpoint_ptr_set_state(epptr, EPState_Send);
+            endpoint_ptr_set_state(epptr, EPState_Send);
         }
     }
 }
