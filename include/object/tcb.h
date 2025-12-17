@@ -96,6 +96,7 @@ static inline void tcb_queue_insert(tcb_t *tcb, tcb_t *after)
     before->tcbSchedNext = tcb;
 }
 
+#ifdef CONFIG_KERNEL_MCS
 /* Insert a TCB into a queue immediately after another item in the queue
    (the queue must initially contain at least two items) */
 static inline void tcb_queue_insert_after(tcb_t *tcb, tcb_t *before)
@@ -112,6 +113,7 @@ static inline void tcb_queue_insert_after(tcb_t *tcb, tcb_t *before)
     after->tcbSchedPrev = tcb;
     before->tcbSchedNext = tcb;
 }
+#endif
 
 #ifdef CONFIG_DEBUG_BUILD
 void tcbDebugAppend(tcb_t *tcb);
